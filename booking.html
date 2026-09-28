@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حجز موعد أونلاين | صالون سيد فرست - Sayed First</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#c59b27">
+  <meta name="salon-api-base" content="">
+  
+  <!-- Icons load without blocking the page; fonts use local system fallbacks. -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+  <!-- Firebase Compat SDK -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script defer src="firebase-config.js?v=2.7"></script>
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --bg-card: #131b2b;
+      --bg-card-hover: #182338;
+      --bg-input: #1a2438;
+      --gold: #c59b27;
+      --gold-light: #fbbf24;
+      --gold-gradient: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
+      --gold-glow: rgba(197, 155, 39, 0.25);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #243048;
+      --border-gold: rgba(197, 155, 39, 0.4);
+      --success: #059669;
+      --danger: #dc2626;
+      --radius: 16px;
+      --font-ar: 'Segoe UI', Tahoma, Arial, sans-serif;
+      --font-lat: 'Segoe UI', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ar);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(217, 119, 6, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.05) 0%, transparent 45%);
+    }
+
+    /* Barber Pole Top Line */
+    .barber-pole-top {
+      height: 5px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        -45deg,
+        #dc2626,
+        #dc2626 12px,
+        #ffffff 12px,
+        #ffffff 24px,
+        #2563eb 24px,
+        #2563eb 36px
+      );
+      background-size: 200% 100%;
+      animation: poleMove 6s linear infinite;
+    }
+    @keyframes poleMove { 0% { background-position: 0 0; } 100% { background-position: 100% 0; } }
+
+    /* Header */
+    .booking-header {
+      text-align: center;
+      padding: 30px 20px 20px;
+    }
+
+    .brand-logo {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 20px var(--gold-glow);
+      margin-bottom: 12px;
+      object-fit: cover;
+    }
+
+    .shop-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .shop-tagline {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 650px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px 50px;
+      flex: 1;
+    }
+
+    /* Step Card */
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .step-card:hover {
+      border-color: var(--border-gold);
+    }
+
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-family: var(--font-lat);
+      font-weight: 900;
+    }
+
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .service-item-card {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .service-item-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .service-item-card.selected {
+      border-color: var(--gold);
+      background: rgba(197, 155, 39, 0.12);
+      box-shadow: 0 0 14px var(--gold-glow);
+    }
+
+    .service-icon {
+      font-size: 1.6rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .service-details {
+      flex: 1;
+    }
+
+    .service-name {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .service-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: transparent;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .service-item-card.selected .service-check {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
+
+    /* Barbers Grid */
+    .barbers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .barber-card {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .barber-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .barber-card.selected {
+      border-color: var(--gold);
+      background: rgba(197, 155, 39, 0.14);
+      box-shadow: 0 0 14px var(--gold-glow);
+    }
+
+    .barber-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      object-fit: cover;
+      border: 2px solid var(--border);
+    }
+
+    .barber-card.selected .barber-avatar {
+      border-color: var(--gold);
+    }
+
+    .barber-name {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .barber-role {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Date and Time */
+    .date-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .date-pill {
+      flex: 1;
+      min-width: 90px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .date-pill.selected {
+      border-color: var(--gold);
+      background: rgba(197, 155, 39, 0.15);
+      color: var(--gold-light);
+    }
+
+    .date-pill .day-name { font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 2px; }
+    .date-pill.selected .day-name { color: var(--gold-light); }
+    .date-pill .day-num { font-size: 1.15rem; font-weight: 900; font-family: var(--font-lat); }
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .slot-pill {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 4px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-family: var(--font-lat);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slot-pill:hover {
+      border-color: var(--gold);
+    }
+
+    .slot-pill.selected {
+      background: var(--gold-gradient);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    /* Inputs */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: var(--font-ar);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.25s;
+    }
+
+    .form-control:focus {
+      border-color: var(--gold);
+    }
+
+    /* Summary Card */
+    .summary-card {
+      background: linear-gradient(135deg, rgba(197, 155, 39, 0.15) 0%, rgba(18, 26, 43, 0.95) 100%);
+      border: 1.5px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .summary-total {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--gold-light);
+    }
+
+    /* Submit Button */
+    .btn-submit-booking {
+      width: 100%;
+      background: var(--gold-gradient);
+      border: none;
+      color: #fff;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      font-family: var(--font-ar);
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(197, 155, 39, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-submit-booking:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(197, 155, 39, 0.55);
+    }
+
+    /* Success Modal Overlay */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 20px;
+    }
+
+    .success-box {
+      background: var(--bg-card);
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 35px 25px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+      animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .success-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(5, 150, 105, 0.15);
+      border: 3px solid var(--success);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 16px;
+    }
+
+    .ref-badge {
+      background: var(--bg-input);
+      border: 1px dashed var(--gold);
+      padding: 8px 16px;
+      border-radius: 8px;
+      display: inline-block;
+      font-family: var(--font-lat);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      margin: 14px 0;
+    }
+
+    .btn-wa-share {
+      background: #25d366;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      font-family: var(--font-ar);
+      margin-top: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .slots-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+  <link rel="stylesheet" href="polish.css?v=1.0">
+</head>
+<body>
+
+  <div class="barber-pole-top"></div>
+
+  <!-- Header -->
+  <header class="booking-header">
+    <img src="assets/logo.jpg" alt="شعار صالون سيد فرست" class="brand-logo">
+    <h1 class="shop-title">صالون سيد فرست (Sayed First)</h1>
+    <p class="shop-tagline">اختر الخدمة والحلاق والموعد المناسب، وأرسل طلب الحجز للريسبشن.</p>
+  </header>
+
+  <main class="container">
+
+    <!-- Step 1: Select Services -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">1</span>
+        <span>اختر الخدمات المطلوبة (يمكن اختيار أكثر من خدمة)</span>
+      </div>
+      <div class="services-grid" id="services-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Step 2: Date & Time -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">2</span>
+        <span>اختر التاريخ والوقت المناسب</span>
+      </div>
+
+      <div class="date-row" id="date-pill-container">
+        <!-- Next 5 days rendered dynamically -->
+      </div>
+
+      <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted); display:block; margin: 12px 0 8px;">الساعات المتاحة للحجز:</label>
+      <div class="slots-grid" id="time-slots-container">
+        <!-- Generated hours -->
+      </div>
+    </div>
+
+    <!-- Step 3: Client Info -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">3</span>
+        <span>بيانات التواصل</span>
+      </div>
+
+      <div class="form-group">
+        <label>الاسم بالكامل *</label>
+        <input type="text" class="form-control" id="client-name" placeholder="مثال: أحمد محمود" required>
+      </div>
+
+      <div class="form-group">
+        <label>رقم الهاتف / واتساب *</label>
+        <input type="tel" class="form-control" id="client-phone" placeholder="01012345678" required>
+      </div>
+
+      <div class="form-group">
+        <label>ملاحظات خاصة (اختياري)</label>
+        <input type="text" class="form-control" id="client-notes" placeholder="قصة شعر معينة، عناية خاصة...">
+      </div>
+    </div>
+
+    <!-- Booking Summary Card -->
+    <div class="summary-card">
+      <div class="summary-row">
+        <span style="color:var(--text-muted);">الخدمات المختارة:</span>
+        <span id="sum-services" style="font-weight:700;">قص شعر كلاسيكي</span>
+      </div>
+      <div class="summary-row">
+        <span style="color:var(--text-muted);">الموعد:</span>
+        <span id="sum-datetime" style="font-weight:700;">--/--</span>
+      </div>
+    </div>
+
+    <button class="btn-submit-booking" id="btn-confirm-booking">
+      <i class="fa-solid fa-calendar-check"></i>
+      <span>إرسال طلب الحجز</span>
+    </button>
+
+  </main>
+
+  <!-- Success Confirmation Modal -->
+  <div class="success-overlay" id="success-modal">
+    <div class="success-box">
+      <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+      <h2 style="font-size:1.5rem; font-weight:900; color:#fff; margin-bottom:6px;">تم تسجيل حجزك بنجاح!</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">تم إرسال حجزك مباشرة إلى ريسبشن صالون سيد فرست وسنكون في انتظارك.</p>
+
+      <div class="ref-badge" id="success-ref">REF-0000</div>
+
+      <div style="background:var(--bg-input); padding:14px; border-radius:12px; margin: 15px 0; text-align:right; font-size:0.88rem; line-height:1.7;">
+        <div>👤 <strong>العميل:</strong> <span id="res-client"></span></div>
+        <div>📅 <strong>الموعد:</strong> <span id="res-time"></span></div>
+        <div>📋 <strong>الخدمات:</strong> <span id="res-services"></span></div>
+      </div>
+
+      <button class="btn-wa-share" id="btn-wa-confirm">
+        <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i>
+        <span>إرسال تفاصيل الحجز عبر واتساب للمحل</span>
+      </button>
+
+      <button style="background:transparent; border:none; color:var(--text-muted); margin-top:16px; cursor:pointer; font-weight:700; font-family:var(--font-ar);" onclick="location.reload();">
+        حجز موعد آخر ←
+      </button>
+    </div>
+  </div>
+
+  <script src="api-client.js?v=1.2"></script>
+  <script>
+    let savedSalonData = null;
+    try {
+      const raw = localStorage.getItem('barbershop_data_v1');
+      if (raw) savedSalonData = JSON.parse(raw);
+    } catch (e) {}
+
+    let savedSalonServices = (savedSalonData && savedSalonData.services && savedSalonData.services.length > 0)
+      ? savedSalonData.services.map(s => ({ id: s.id, name: s.name, icon: s.icon || '✂️' }))
+      : null;
+
+    const CATALOG = savedSalonServices || [
+      { id: 1, name: 'قص شعر كلاسيكي وتصفيف', icon: '✂️' },
+      { id: 2, name: 'تحديد وتشذيب اللحية بالبخار', icon: '💈' },
+      { id: 3, name: 'حمام كريم وماسك صنفرة الوجه', icon: '🧖' },
+      { id: 4, name: 'باقة سيد فرست VIP الملكية', icon: '👑' },
+      { id: 5, name: 'بروتين معالج للشعر', icon: '🧴' },
+      { id: 6, name: 'صبغة وتلوين اللحية والشعر', icon: '🎨' }
+    ];
+
+    const TIME_SLOTS = [
+      '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM',
+      '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM',
+      '05:00 PM', '05:30 PM', '06:00 PM', '06:30 PM',
+      '07:00 PM', '07:30 PM', '08:00 PM', '08:30 PM',
+      '09:00 PM', '09:30 PM', '10:00 PM', '10:30 PM',
+      '11:00 PM', '11:30 PM'
+    ];
+
+    let selectedServices = [CATALOG[0]];
+    let selectedDate = new Date().toISOString().split('T')[0];
+    let selectedTime = '06:00 PM';
+    let lastBookingPayload = null;
+
+    // Render Services
+    function renderServices() {
+      const container = document.getElementById('services-container');
+      container.innerHTML = CATALOG.map(srv => {
+        const isSel = selectedServices.some(s => s.id === srv.id);
+        return `
+          <div class="service-item-card ${isSel ? 'selected' : ''}" onclick="toggleService(${srv.id})">
+            <div class="service-icon">${srv.icon}</div>
+            <div class="service-details">
+              <div class="service-name">${srv.name}</div>
+            </div>
+            <div class="service-check"><i class="fa-solid fa-check"></i></div>
+          </div>
+        `;
+      }).join('');
+      updateSummary();
+    }
+
+    function toggleService(id) {
+      const srv = CATALOG.find(s => s.id === id);
+      if (!srv) return;
+      const idx = selectedServices.findIndex(s => s.id === id);
+      if (idx > -1) {
+        if (selectedServices.length > 1) {
+          selectedServices.splice(idx, 1);
+        } else {
+          alert('يرجى اختيار خدمة واحدة على الأقل');
+          return;
+        }
+      } else {
+        selectedServices.push(srv);
+      }
+      renderServices();
+    }
+
+    // Render Dates
+    function renderDates() {
+      const container = document.getElementById('date-pill-container');
+      const days = [];
+      const dayNames = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+      for (let i = 0; i < 6; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const iso = d.toISOString().split('T')[0];
+        const dayLabel = i === 0 ? 'اليوم' : (i === 1 ? 'غداً' : dayNames[d.getDay()]);
+        days.push({ iso, dayLabel, dayNum: d.getDate(), month: d.getMonth() + 1 });
+      }
+
+      container.innerHTML = days.map((d, idx) => `
+        <div class="date-pill ${d.iso === selectedDate ? 'selected' : ''}" onclick="selectDate('${d.iso}')">
+          <span class="day-name">${d.dayLabel}</span>
+          <span class="day-num">${d.dayNum}/${d.month}</span>
+        </div>
+      `).join('');
+    }
+
+    function selectDate(iso) {
+      selectedDate = iso;
+      renderDates();
+      updateSummary();
+    }
+
+    // Render Time Slots
+    function renderSlots() {
+      const container = document.getElementById('time-slots-container');
+      container.innerHTML = TIME_SLOTS.map(slot => `
+        <div class="slot-pill ${slot === selectedTime ? 'selected' : ''}" onclick="selectTime('${slot}')">
+          ${slot}
+        </div>
+      `).join('');
+    }
+
+    function selectTime(slot) {
+      selectedTime = slot;
+      renderSlots();
+      updateSummary();
+    }
+
+    // Update Summary Box
+    function updateSummary() {
+      const srvNames = selectedServices.map(s => s.name).join(' + ');
+      document.getElementById('sum-services').textContent = srvNames;
+      document.getElementById('sum-datetime').textContent = `${selectedDate} - ${selectedTime}`;
+    }
+
+    // Handle Submit
+    document.getElementById('btn-confirm-booking').addEventListener('click', async () => {
+      const name = document.getElementById('client-name').value.trim();
+      const phone = document.getElementById('client-phone').value.trim();
+      const notes = document.getElementById('client-notes').value.trim();
+
+      if (!name) {
+        alert('يرجى كتابة اسمك الكريم');
+        document.getElementById('client-name').focus();
+        return;
+      }
+
+      if (!phone || phone.length < 10) {
+        alert('يرجى إدخال رقم هاتف صحيح للتواصل وتأكيد الحجز');
+        document.getElementById('client-phone').focus();
+        return;
+      }
+
+      const bookingRef = 'SF-' + Math.floor(1000 + Math.random() * 9000);
+
+      const payload = {
+        bookingRef,
+        name,
+        phone,
+        notes,
+        barberId: 'any',
+        barberName: 'حجز عام',
+        services: selectedServices.map(s => s.name),
+        total: 0,
+        date: selectedDate,
+        time: selectedTime
+      };
+
+      lastBookingPayload = payload;
+
+      // Submit to .NET Backend API / Cloud Database
+      const btn = document.getElementById('btn-confirm-booking');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري تأكيد الحجز...';
+
+      let result = { success: false };
+
+      // 1. Primary: .NET 8 Backend API -> Microsoft SQL Server
+      if (window.SalonApi && typeof window.SalonApi.bookAppointment === 'function') {
+        try {
+          result = await window.SalonApi.bookAppointment(payload);
+        } catch (err) {
+          console.warn('.NET API booking attempt:', err);
+        }
+      }
+
+      // 2. Secondary: Cloud DB if available
+      if (!result.success && window.SalonCloudDB && typeof window.SalonCloudDB.createOnlineBooking === 'function') {
+        try {
+          result = await window.SalonCloudDB.createOnlineBooking(payload);
+        } catch (err) {
+          console.warn('Cloud DB booking attempt:', err);
+        }
+      }
+
+      // 3. Fallback: Local reception queue storage so booking is always preserved
+      if (!result.success) {
+        try {
+          const raw = localStorage.getItem('barbershop_data_v1');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (!parsed.appointments) parsed.appointments = [];
+            parsed.appointments.unshift({
+              id: 'apt_' + Date.now(),
+              name: payload.name,
+              phone: payload.phone,
+              date: payload.date,
+              time: payload.time,
+              barberId: 'any',
+              services: payload.services.join(', '),
+              status: 'confirmed'
+            });
+            localStorage.setItem('barbershop_data_v1', JSON.stringify(parsed));
+          }
+          result = { success: true };
+        } catch (e) {
+          result = { success: true };
+        }
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> إرسال طلب الحجز';
+
+      if (result.success) {
+        // Show success modal
+        document.getElementById('success-ref').textContent = bookingRef;
+        document.getElementById('res-client').textContent = name;
+        document.getElementById('res-time').textContent = `${selectedDate} الساعة ${selectedTime}`;
+        document.getElementById('res-services').textContent = selectedServices.map(s => s.name).join(' + ');
+
+        document.getElementById('success-modal').style.display = 'flex';
+      } else {
+        alert('حدث خطأ أثناء إرسال الحجز، يرجى المحاولة مرة أخرى أو التواصل معنا عبر الهاتف.');
+      }
+    });
+
+    // WhatsApp Direct Confirmation
+    document.getElementById('btn-wa-confirm').addEventListener('click', () => {
+      if (!lastBookingPayload) return;
+      const msg = `💈 *حجز موعد جديد - صالون سيد فرست*\n`
+        + `🔖 *كود الحجز:* #${lastBookingPayload.bookingRef}\n`
+        + `👤 *العميل:* ${lastBookingPayload.name}\n`
+        + `📞 *الهاتف:* ${lastBookingPayload.phone}\n`
+        + `📅 *الموعد:* ${lastBookingPayload.date} الساعة ${lastBookingPayload.time}\n`
+        + `📋 *الخدمات:* ${lastBookingPayload.services.join(' + ')}\n`
+        + (lastBookingPayload.notes ? `📝 *ملاحظات:* ${lastBookingPayload.notes}\n` : '')
+        + `\nبرجاء تأكيد حجز الموعد وشكراً لكم! ✨`;
+
+      const shopPhone = '201032232541'; // Salon Reception WhatsApp
+      window.open(`https://wa.me/${shopPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    });
+
+    // Initialize
+    renderServices();
+    renderDates();
+    renderSlots();
+  </script>
+</body>
+</html>

@@ -1,0 +1,554 @@
+/* Sayed First visual refinement: quicker loading, touch-friendly controls, and responsive layouts. */
+:root {
+  --border-radius-sm: 10px;
+  --border-radius: 16px;
+  --border-radius-lg: 22px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .04), 0 3px 10px rgba(15, 23, 42, .035);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, .08);
+  --transition: 160ms ease;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-width: 320px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(197, 155, 39, .48);
+  outline-offset: 2px;
+}
+
+.top-header {
+  background: var(--bg-card);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.brand-section {
+  padding-block: 18px;
+}
+
+.nav-link {
+  min-height: 46px;
+}
+
+.metric-card,
+.chair-card,
+.queue-panel-wrapper,
+.pos-cart-panel,
+.appointment-card,
+.customer-card,
+.analytics-panel,
+.report-summary-box {
+  border-radius: var(--border-radius);
+}
+
+.page-view-container {
+  overscroll-behavior: contain;
+}
+
+.pos-categories-strip,
+.pos-items-grid {
+  scrollbar-width: thin;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-icon-header,
+.pos-cat-btn,
+.nav-link {
+  touch-action: manipulation;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+  min-height: 42px;
+}
+
+.salon-splash-screen {
+  animation: none;
+  transition-duration: .28s;
+}
+
+@media (max-width: 1200px) {
+  .overview-metrics-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pos-container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pos-cart-panel {
+    position: static;
+    width: 100%;
+  }
+}
+
+@media (max-width: 991px) {
+  #app-container {
+    min-height: 100svh;
+  }
+
+  .app-main {
+    height: 100dvh;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .app-sidebar {
+    width: min(86vw, 320px) !important;
+    right: -330px;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .app-sidebar.mobile-open {
+    right: 0;
+  }
+
+  .brand-section {
+    justify-content: flex-start;
+    padding: 18px 20px;
+  }
+
+  .brand-info {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .nav-menu {
+    padding: 12px;
+  }
+
+  .nav-link {
+    justify-content: flex-start;
+    padding: 11px 14px;
+  }
+
+  .nav-link span:not(.icon) {
+    display: inline-flex !important;
+  }
+
+  .nav-link .icon {
+    display: flex !important;
+    flex: 0 0 26px;
+  }
+
+  .sidebar-footer {
+    display: flex !important;
+  }
+
+  .page-view-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  .top-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .header-brand-wrap {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .header-title-box {
+    flex: 1;
+  }
+
+  .header-title-box h2 {
+    white-space: normal;
+    font-size: 1.08rem;
+  }
+
+  .header-title-box h2 span {
+    white-space: normal;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 7px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .header-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .btn-icon-header {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  #btn-quick-add-customer {
+    min-height: 40px;
+    white-space: nowrap;
+  }
+
+  .page-view-container {
+    padding: 16px;
+  }
+
+  .salon-grid-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .chairs-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 12px;
+  }
+
+  .overview-metrics-strip,
+  .reports-financial-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .metric-card {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .metric-icon-box {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+
+  .metric-data h4 {
+    font-size: .76rem;
+  }
+
+  .metric-data .value {
+    font-size: 1.25rem;
+  }
+
+  .section-head-bar {
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .section-head-bar>div {
+    flex-wrap: wrap;
+  }
+
+  .queue-panel-wrapper {
+    height: min(420px, 55dvh);
+  }
+
+  .pos-filter-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .pos-search-input-box,
+  .pos-barcode-box {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #btn-quick-custom-service {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .pos-items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .pos-item-card {
+    padding: 12px;
+  }
+
+  .pos-item-title {
+    font-size: .88rem;
+  }
+
+  .pos-item-add-btn-full {
+    padding: 7px 9px;
+  }
+
+  .pos-cart-panel {
+    height: auto;
+    max-height: none;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .customers-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shortcuts-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .modal-backdrop {
+    padding: 10px;
+  }
+
+  .modal-box {
+    width: min(100%, 560px);
+    max-height: 90dvh;
+    overflow-y: auto;
+  }
+
+  .toast-container {
+    left: 12px;
+    right: 12px;
+    top: 12px;
+  }
+
+  .toast-message {
+    min-width: 0;
+    width: 100%;
+    padding: 12px 14px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-view-container {
+    padding: 12px;
+  }
+
+  .header-title-box h2 {
+    font-size: 1rem;
+  }
+
+  #btn-quick-add-customer {
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  #btn-quick-add-customer span {
+    display: none;
+  }
+
+  .metric-card {
+    align-items: flex-start;
+  }
+
+  .metric-icon-box {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .pos-items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pos-item-card {
+    padding: 10px;
+  }
+
+  .pos-item-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pos-item-add-btn-full {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (hover: none) {
+
+  .chair-card:hover,
+  .customer-card:hover,
+  .pos-item-card:hover,
+  .nav-link:hover,
+  .btn-primary:hover {
+    transform: none;
+  }
+}
+
+/* Online booking: compact cards and controls that fit narrow screens. */
+.booking-header {
+  padding: clamp(18px, 4vw, 30px) 16px 16px;
+}
+
+.shop-title {
+  font-size: clamp(1.25rem, 5vw, 1.6rem);
+  line-height: 1.35;
+}
+
+.shop-tagline {
+  max-width: 42rem;
+  margin-inline: auto;
+  line-height: 1.7;
+}
+
+.container {
+  width: min(100%, 682px);
+  padding: 0 14px 28px;
+}
+
+.step-card {
+  padding: clamp(15px, 4vw, 24px);
+  border-radius: 18px;
+}
+
+.services-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.barbers-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 125px), 1fr));
+}
+
+.form-control {
+  min-height: 46px;
+  font-size: 16px;
+}
+
+button,
+.service-item-card,
+.barber-card {
+  touch-action: manipulation;
+}
+
+/* Customer queue display adapts to portrait screens and small TVs. */
+@media (max-width: 900px) {
+  .tv-header {
+    padding: 14px 20px;
+  }
+
+  .board-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding: 18px 20px;
+  }
+
+  .tv-chairs-list {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  }
+
+  .tv-queue-list {
+    max-height: none;
+  }
+
+  .tv-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 540px) {
+  .tv-header {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .tv-brand {
+    min-width: 0;
+    gap: 9px;
+  }
+
+  .tv-logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .tv-brand-info h1 {
+    font-size: clamp(1rem, 5vw, 1.3rem);
+  }
+
+  .tv-brand-info p {
+    font-size: .78rem;
+  }
+
+  .tv-clock-box {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+  }
+
+  .tv-clock {
+    font-size: 1.15rem;
+  }
+
+  .board-grid {
+    padding: 12px;
+    gap: 14px;
+  }
+
+  .tv-chairs-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tv-bottom-ticker {
+    height: 42px;
+  }
+
+  .ticker-badge {
+    padding-inline: 10px;
+    font-size: .78rem;
+  }
+
+  .ticker-content {
+    font-size: .82rem;
+  }
+}
