@@ -1,11 +1,11 @@
 {
-  "name": "صالون سيد فرست - Sayed First POS",
-  "short_name": "سيد فرست",
-  "description": "نظام إدارة الاستقبال ونقطة البيع الفاخر لصالون سيد فرست",
+  "name": "صالون يوسف فريست - Youssef First POS",
+  "short_name": "يوسف فريست",
+  "description": "إدارة الاستقبال والحجوزات والمبيعات لصالون يوسف فريست",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b0f19",
-  "theme_color": "#c59b27",
+  "background_color": "#f7f7f5",
+  "theme_color": "#161a2b",
   "lang": "ar",
   "dir": "rtl",
   "icons": [

@@ -1,0 +1,192 @@
+/* SAYED FIRST — refined system: quiet neutrals, ink, one copper accent used sparingly.
+   Presentation only: no IDs, JS hooks or API code touched. */
+:root{
+  --bg-body:#f7f7f5;--bg-sidebar:#161a2b;--bg-card:#fff;--bg-card-hover:#fbfbf9;--bg-surface:#f1f1ee;--bg-input:#fff;
+  --gold:#b8742c;--gold-light:#9a5f22;--gold-dark:#6f4416;--gold-glow:rgba(184,116,44,.16);
+  --gold-gradient:linear-gradient(#1c2033,#1c2033);--gold-gradient-soft:linear-gradient(#f6ede2,#f6ede2);
+  --primary:#1c2033;--primary-rgb:28,32,51;
+  --text-main:#1a1d29;--text-muted:#6b7080;--text-dim:#a0a4b2;
+  --border-gold:#ecdcc6;--border-subtle:#ebebe7;--border-input:#dcdcd6;
+  --border-radius-sm:8px;--border-radius:12px;--border-radius-lg:16px;
+  --shadow-sm:0 1px 2px rgba(20,24,40,.04);--shadow-md:0 8px 24px rgba(20,24,40,.08);--shadow-modal:0 24px 64px rgba(10,13,28,.28);
+  --font-arabic:"Cairo","Segoe UI",Tahoma,Arial,sans-serif;--font-latin:"Cairo","Segoe UI",Arial,sans-serif;
+}
+html{background:var(--bg-body);-webkit-text-size-adjust:100%}
+body{font-family:var(--font-arabic);color:var(--text-main);background:var(--bg-body);line-height:1.65;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid #b8742c;outline-offset:2px}
+
+/* ---------- Shell ---------- */
+#app-container{background:var(--bg-body)}
+.app-sidebar{width:248px;color:#e6e8f0;background:#161a2b;border:0;box-shadow:none}
+.brand-section{min-height:96px;padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.brand-logo-img{width:44px;height:44px;border:0;border-radius:12px;box-shadow:none}
+.brand-info h1{color:#fff;font-size:1rem;font-weight:700}
+.role-brand-badge{color:#aab0c6;background:transparent;border:0;padding:0;font-size:.76rem}
+.nav-menu{padding:18px 12px;gap:2px}
+.nav-link{min-height:42px;color:#98a0b8;padding:9px 12px;border:0;border-radius:10px;font-weight:500;transition:background .15s,color .15s}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.05)}
+.nav-link.active{color:#fff;background:rgba(255,255,255,.08);box-shadow:inset -2px 0 #d9924a}
+.nav-link .icon{color:#757c96;background:transparent}
+.nav-link.active .icon,.nav-link:hover .icon{color:#e2a565;background:transparent}
+.nav-badge{color:#161a2b;background:#e2a565;border-radius:20px;font-weight:700}
+.nav-role-tag{color:#e2a565}
+.sidebar-footer{gap:8px;padding:14px;border-top:1px solid rgba(255,255,255,.06)}
+.shift-status-card{color:#cfd3e2;background:rgba(255,255,255,.04);border:0;border-radius:12px}
+.shift-status-card *{color:inherit}
+.shift-indicator{color:#e2a565!important}
+.btn-tv-board{color:#e6e8f0!important;background:transparent!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:10px}
+.btn-tv-board:hover{background:rgba(255,255,255,.06)!important}
+.app-main{min-width:0;background:var(--bg-body)}
+.top-header{min-height:80px;padding:16px 32px;background:#fff;border-bottom:1px solid var(--border-subtle);box-shadow:none;backdrop-filter:none}
+.header-title-box h2{color:var(--text-main);font-size:1.15rem;font-weight:700}
+.header-title-box h2 i{color:var(--text-dim)!important}
+.header-title-box p{color:var(--text-muted);font-size:.83rem;margin-top:2px}
+.header-actions{gap:6px}
+.btn-icon-header{color:#5a6075;background:transparent;border:1px solid var(--border-subtle);border-radius:10px}
+.btn-icon-header:hover{color:var(--text-main);background:#f4f4f1;border-color:#d8d8d2;transform:none}
+.btn-role-badge{color:#454a5e;background:transparent;border:1px solid var(--border-subtle);border-radius:10px}
+.btn-role-badge:hover{background:#f4f4f1}
+.cloud-status-badge{border-radius:20px}
+.page-view-container{padding:32px}
+.role-mode-strip{border-radius:10px;margin-inline:28px}
+
+/* ---------- Surfaces: flat, hairline borders, generous space ---------- */
+.metric-card,.analytics-panel,.report-summary-box,.queue-panel-wrapper,.pos-cart-panel,.appointment-card,.customer-card,.chair-card,.service-card,.product-card,.settings-card{
+  background:#fff;border:1px solid var(--border-subtle);border-radius:14px;box-shadow:none}
+.overview-metrics-strip{gap:16px}
+.metric-card{min-height:104px;padding:20px}
+.metric-card::after{display:none}
+.metric-card:hover,.customer-card:hover,.chair-card:hover,.pos-item-card:hover{box-shadow:none;transform:none;border-color:#d6d6cf}
+.metric-icon-box{color:#5a6075;background:#f4f4f1;border:0;border-radius:10px}
+.metric-data h4{color:var(--text-muted);font-size:.78rem;font-weight:500}
+.metric-data .value{color:var(--text-main);font-size:1.6rem;font-weight:700;letter-spacing:-.3px}
+.salon-grid-layout{gap:24px}
+.section-head-bar{padding-bottom:14px;border-bottom:1px solid var(--border-subtle)}
+.section-head-bar h3{color:var(--text-main);font-size:1rem;font-weight:700}
+.chairs-grid{gap:16px}
+.chair-card{padding:18px;overflow:hidden}
+.chair-card.available{border-color:#d3e6da;background:#fff}
+.chair-card.busy{border-color:#eddcc3;background:#fff}
+.chair-card.master-chair{border-color:#c9c9c2}
+.queue-panel-wrapper{padding:20px}
+.queue-list-items{gap:10px}
+.queue-item,.appointment-card{border-radius:12px}
+.pos-container{gap:20px}
+.pos-filter-bar{background:#fff;border:1px solid var(--border-subtle);border-radius:12px;box-shadow:none}
+.pos-search-input-box,.pos-barcode-box{border-color:var(--border-input);background:#fff;border-radius:10px}
+.pos-items-grid{gap:14px}
+.pos-item-card{background:#fff;border:1px solid var(--border-subtle);border-radius:12px;box-shadow:none}
+.pos-cat-btn{border-radius:20px}
+.pos-cat-btn.active{color:#fff;background:#1c2033;border-color:#1c2033}
+.pos-cart-panel{padding:22px}
+
+/* ---------- Controls ---------- */
+.btn-primary,.btn-chair-finish,.btn-submit-booking{min-height:42px;color:#fff;background:#1c2033;border:0;border-radius:10px;box-shadow:none;font-weight:600}
+.btn-primary:hover,.btn-chair-finish:hover,.btn-submit-booking:hover{color:#fff;background:#2c3250;box-shadow:none;transform:none}
+.btn-secondary,.btn-danger,.btn-icon,.btn-cancel{min-height:40px;border-radius:10px}
+input,select,textarea{border-radius:10px}
+input:focus,select:focus,textarea:focus{border-color:#1c2033!important;box-shadow:0 0 0 3px rgba(28,32,51,.08)}
+.modal-backdrop{background:rgba(14,17,30,.5);backdrop-filter:blur(3px)}
+.modal-box{border:0;border-radius:16px;box-shadow:var(--shadow-modal)}
+thead th{color:#6b7080;background:#f7f7f5;font-weight:600;font-size:.8rem}
+tbody tr:hover{background:#fafaf8}
+.toast-message{border-radius:10px;box-shadow:0 10px 28px rgba(20,24,40,.16)}
+
+/* ---------- Online booking ---------- */
+body:has(.booking-header){
+  --bg:#f7f7f5;--bg-card:#fff;--bg-card-hover:#fbfbf9;--bg-input:#fff;--gold:#b8742c;--gold-light:#9a5f22;
+  --gold-gradient:linear-gradient(#1c2033,#1c2033);--gold-glow:rgba(184,116,44,.14);
+  --text:#1a1d29;--text-muted:#6b7080;--border:#ebebe7;--border-gold:#ecdcc6;--success:#2f7d57;--danger:#c4453f;
+  font-family:var(--font-arabic);color:var(--text);background:#f7f7f5}
+.barber-pole-top{height:3px;background:#1c2033;animation:none}
+.booking-header{padding:44px 16px 28px}
+.brand-logo{border:0;border-radius:18px;box-shadow:0 4px 14px rgba(20,24,40,.12)}
+.shop-title{color:#1c2033;font-size:clamp(1.5rem,4vw,2rem);font-weight:700;letter-spacing:-.3px}
+.shop-tagline{max-width:34rem;margin-inline:auto;color:var(--text-muted);line-height:1.9}
+.container{width:min(100%,640px);padding-bottom:40px}
+.step-card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 2px rgba(20,24,40,.04);margin-bottom:16px}
+.step-card:hover{border-color:#dcdcd6}
+.step-title{color:#1a1d29;border-bottom-color:#f0f0ec;font-weight:700}
+.step-num{color:#fff;background:#1c2033}
+.service-item-card,.barber-card{background:#fff;border-color:var(--border);border-radius:12px}
+.service-item-card:hover,.barber-card:hover{background:#fbfbf9;border-color:#cfcfc8;transform:none}
+.service-item-card.selected,.barber-card.selected{background:#faf6f0;border-color:#1c2033;box-shadow:0 0 0 1px #1c2033}
+.date-pill,.slot-pill{border-radius:10px}
+.date-pill.active,.slot-pill.selected{color:#fff;background:#1c2033;border-color:#1c2033}
+.form-control{min-height:48px;color:var(--text);background:#fff;border-color:var(--border-input);font-size:16px}
+.summary-card{background:#f7f7f5;border:1px solid var(--border);border-radius:12px}
+.summary-total{color:#1c2033;font-weight:700}
+.btn-submit-booking{width:100%;min-height:52px;margin-top:16px;font-size:1rem}
+.success-overlay{background:rgba(14,17,30,.55);backdrop-filter:blur(4px)}
+.success-box{color:var(--text);background:#fff;border:0;border-radius:18px}
+.success-box h2{color:#1c2033!important}
+.success-box p{color:var(--text-muted)!important}
+.btn-wa-share{border-radius:10px}
+
+/* ---------- Queue board (TV) ---------- */
+body:has(.tv-header){
+  --bg:#0f1220;--card-bg:#171b2e;--card-border:#262b45;--gold:#e2a565;--gold-light:#f0c08c;
+  --gold-gradient:linear-gradient(#e2a565,#e2a565);--text:#f3f4f8;--text-muted:#a9aec4;
+  --success:#7fd6a4;--warning:#f0c27b;--danger:#f0928c;
+  font-family:var(--font-arabic);color:var(--text);background:#0f1220}
+body:has(.tv-header) .barber-pole-top{height:3px;background:#e2a565}
+.tv-header{padding:20px clamp(20px,4vw,56px);background:#0f1220;border-color:#262b45;box-shadow:none;backdrop-filter:none}
+.tv-logo{border:0;border-radius:14px;box-shadow:none}
+.tv-brand-info h1{color:#fff;font-weight:700}
+.tv-brand-info p,.tv-clock{color:#e2a565}
+.tv-date{color:#a9aec4}
+.board-grid{gap:32px;padding:clamp(20px,3vw,44px)}
+.col-title-bar{color:#f3f4f8;border-bottom-color:#262b45}
+.badge-count{color:#161a2b;background:#e2a565;border-radius:20px}
+.tv-chair-card,.tv-queue-item{color:#f3f4f8;background:#171b2e;border:1px solid #262b45;border-radius:14px;box-shadow:none}
+.tv-chair-cust-name,.tv-queue-name{color:#fff;font-weight:600}
+.tv-chair-barber,.tv-chair-time,.tv-queue-barber-req,.tv-queue-wait{color:#a9aec4}
+.tv-chair-status{border-radius:20px}
+.tv-footer{color:#a9aec4;background:#0f1220;border-color:#262b45}
+.fullscreen-btn{color:#f3f4f8;background:transparent;border-color:#333857;border-radius:10px}
+.tv-bottom-ticker{background:#0a0d19;border-top-color:#262b45}
+.ticker-badge{color:#161a2b;background:#e2a565}
+.ticker-content{color:#dfe2ee}
+.call-announcement-card{color:#fff;background:#171b2e;border:1px solid #e2a565;border-radius:18px}
+.call-badge-top{color:#e2a565}
+.call-chair-dest,.call-barber-dest{color:#b9bed2}
+
+/* ---------- Responsive ---------- */
+@media (max-width:991px){
+  .app-sidebar{width:min(86vw,320px)!important;right:-330px;height:100dvh;overflow-y:auto;box-shadow:-16px 0 44px rgba(0,0,0,.35)}
+  .app-sidebar.mobile-open{right:0}
+  .brand-section{justify-content:flex-start;padding:18px 20px}
+  .brand-info{display:flex!important;flex-direction:column}
+  .nav-menu{padding:12px}
+  .nav-link{justify-content:flex-start;padding:11px 14px}
+  .nav-link span:not(.icon){display:inline-flex!important}
+  .nav-link .icon{display:flex!important;flex:0 0 26px}
+  .sidebar-footer{display:flex!important}
+  .top-header{padding:14px 18px}
+  .page-view-container{padding:22px 16px}
+}
+@media (max-width:680px){
+  .top-header{min-height:0;gap:10px}
+  .header-title-box h2{font-size:1rem}
+  .page-view-container{padding:16px 12px}
+  .overview-metrics-strip{gap:10px}
+  .metric-card{min-width:0;padding:14px}
+  .metric-data .value{font-size:1.25rem}
+  .modal-backdrop{padding:10px}
+  .modal-box{width:min(100%,560px);max-height:91dvh;overflow-y:auto;border-radius:14px}
+  .booking-header{padding:30px 14px 18px}
+  .container{padding-inline:12px}
+  .step-card{padding:18px}
+  .tv-header{gap:10px;padding:12px 14px}
+  .tv-brand{min-width:0;gap:9px}
+  .tv-logo{width:46px;height:46px}
+  .tv-brand-info h1{font-size:clamp(1rem,5vw,1.35rem)}
+  .tv-clock-box{flex-direction:column;align-items:flex-end;gap:0}
+  .board-grid{padding:14px;gap:16px}
+  .tv-chairs-list{grid-template-columns:minmax(0,1fr)}
+  .tv-bottom-ticker{height:42px}
+}
+@media (max-width:380px){.header-actions .btn-icon-header{flex:0 0 36px;width:36px;height:36px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}

@@ -1,5 +1,5 @@
 /**
- * صالون سيد فرست (Sayed First) - Cloud Database Engine (Firebase Firestore)
+ * صالون يوسف فريست (Youssef First) - Cloud Database Engine (Firebase Firestore)
  * Enables Real-Time Cloud Synchronization, Online Customer Booking & Remote Admin Access
  */
 
@@ -101,7 +101,7 @@ class SalonCloudDatabase {
 
       this.isInitialized = true;
       this.notifyStatusChange('connected');
-      console.log('✅ Salon Cloud Database initialized successfully for project:', config.projectId);
+      console.log(' Salon Cloud Database initialized successfully for project:', config.projectId);
     } catch (err) {
       console.warn('Firebase init warning:', err.message);
       this.isInitialized = false;

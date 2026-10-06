@@ -3,14 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>صالون سيد فرست | إدارة الاستقبال والحجوزات</title>
+  <title>صالون يوسف فريست | إدارة الاستقبال والحجوزات</title>
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#c59b27">
+  <meta name="theme-color" content="#161a2b">
   <meta name="salon-api-base" content="">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Lalezar&display=swap">
   <link rel="stylesheet" href="style.css?v=4.0">
-  <link rel="stylesheet" href="polish.css?v=1.0">
+  <link rel="stylesheet" href="theme.css?v=1.1">
+  <link rel="stylesheet" href="reception.css?v=1.0">
+  <link rel="stylesheet" href="variables.css?v=1.0">
+  <link rel="stylesheet" href="redesign.css?v=1.1">
   <!-- Lucide / FontAwesome Icons via CDN or SVG -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
@@ -21,11 +27,11 @@
   <div id="salon-splash-screen" class="salon-splash-screen" title="انقر للدخول المباشر">
     <div class="splash-content">
       <div class="splash-logo-wrapper">
-        <img src="assets/logo.jpg" alt="شعار صالون سيد فرست" class="splash-logo-img">
+        <img src="assets/logo.jpg" alt="شعار صالون يوسف فريست" class="splash-logo-img">
         <div class="splash-halo"></div>
       </div>
       <div class="splash-text-container">
-        <h1 class="splash-shop-title">صالون سيد فرست</h1>
+        <h1 class="splash-shop-title">صالون يوسف فريست</h1>
         <p class="splash-tagline">إدارة الصالون والاستقبال بسهولة</p>
       </div>
       <div class="splash-progress-track">
@@ -42,7 +48,7 @@
       <div class="brand-section">
         <img src="assets/logo.jpg" alt="Logo" class="brand-logo-img">
         <div class="brand-info">
-          <h1 id="sidebar-shop-name">صالون سيد فرست</h1>
+          <h1 id="sidebar-shop-name">صالون يوسف فريست</h1>
           <div class="role-brand-badge admin" id="sidebar-role-badge">
             <i class="fa-solid fa-crown" id="sidebar-role-icon"></i>
             <span id="sidebar-role-label">المدير العام</span>
@@ -71,7 +77,7 @@
           <span>الحلاقين وفريق العمل</span>
         </a>
         <a class="nav-link" data-view="view-services" id="nav-services" href="javascript:void(0)" onclick="switchView('view-services')">
-          <span class="icon"><i class="fa-solid fa-spray-can-sparkles"></i></span>
+          <span class="icon"><i class="fa-solid fa-spray-can"></i></span>
           <span>الخدمات والمنتجات</span>
         </a>
         <a class="nav-link admin-only" data-view="view-reports" id="nav-reports" href="javascript:void(0)" onclick="switchView('view-reports')">
@@ -140,12 +146,19 @@
         </div>
         
         <div class="header-actions">
+          <div class="header-shift-status"><span class="header-shift-dot"></span><span>الوردية نشطة — الكاشير</span></div>
           <!-- Role Badge / Switcher -->
           <button class="btn-role-badge role-admin" id="btn-role-toggle" title="انقر لتغيير الصلاحيات أو التبديل بين المدير والكاشير">
             <i class="fa-solid fa-user-shield" id="role-badge-icon"></i>
             <span id="role-badge-name">المدير (Admin)</span>
             <span class="role-badge-sub" id="role-badge-sub">كامل الصلاحيات</span>
           </button>
+
+          <div class="header-cash-pill admin-only" id="header-cash-pill">
+            <i class="fa-solid fa-coins"></i>
+            <span>الخزينة</span>
+            <b id="header-drawer-val">٠ ج.م</b>
+          </div>
 
           <!-- System Quick Lock -->
           <button class="btn-icon-header btn-lock-header" id="btn-lock-system" title="قفل السيستم فوراً برقم PIN">
@@ -196,7 +209,7 @@
       <div id="low-stock-alert-bar" style="display:none; align-items:center; gap:10px; background:linear-gradient(90deg,#fef3c7,#fffbeb); border-bottom:2px solid #f59e0b; padding:8px 24px; font-size:0.85rem; font-weight:800; color:#92400e;">
         <i class="fa-solid fa-triangle-exclamation" style="color:#d97706; font-size:1.1rem;"></i>
         <span id="low-stock-alert-text">تنبيه مخزون</span>
-        <a href="#" onclick="event.preventDefault(); switchView('view-services'); document.getElementById('tab-btn-products-list').click();" style="margin-right:auto; color:#92400e; text-decoration:underline; font-size:0.8rem;">إدارة المخزون ←</a>
+        <a href="#" onclick="event.preventDefault(); switchView('view-services'); document.getElementById('tab-btn-products-list').click();" style="margin-right:auto; color:#92400e; text-decoration:underline; font-size:0.8rem;">إدارة المنتجات ←</a>
       </div>
 
       <!-- Role Mode Status Bar -->
@@ -245,7 +258,7 @@
             <div class="metric-card" style="--card-accent: var(--success);">
               <div class="metric-data">
                 <h4>الكراسي المشغولة</h4>
-                <div class="value" id="stat-chairs-active">0 / 0</div>
+                <div class="value" id="stat-chairs-active" dir="ltr">0 / 0</div>
               </div>
               <div class="metric-icon-box"><i class="fa-solid fa-chair"></i></div>
             </div>
@@ -318,10 +331,6 @@
                 <div class="pos-search-input-box">
                   <i class="fa-solid fa-magnifying-glass search-icon"></i>
                   <input type="text" id="pos-search" placeholder="ابحث عن خدمة أو منتج بالاسم...">
-                </div>
-                <div class="pos-barcode-box" title="وجّه مسدس الباركود أو اكتب الكود واضغط Enter">
-                  <i class="fa-solid fa-barcode barcode-icon"></i>
-                  <input type="text" id="pos-barcode-input" placeholder="مسح الباركود السريع..." autocomplete="off">
                 </div>
                 <button class="btn-primary" id="btn-quick-custom-service" style="padding:9px 14px; font-size:0.84rem; white-space:nowrap; border-radius:8px;">
                   <i class="fa-solid fa-plus-circle"></i>
@@ -432,71 +441,9 @@
                 <div style="margin-top:2px;">
                   <span style="font-size:0.78rem; color:var(--text-muted); font-weight:800;">طريقة الدفع:</span>
                   <div class="payment-method-selector">
-                    <button class="pay-btn active" data-method="cash">
-                      <i class="fa-solid fa-money-bill-wave"></i>
-                      <span>نقدي (كاش)</span>
-                    </button>
-                    <button class="pay-btn" data-method="card">
-                      <i class="fa-solid fa-credit-card"></i>
-                      <span>بطاقة / فيزا</span>
-                    </button>
-                    <button class="pay-btn" data-method="wallet">
+                    <div class="pay-btn active" aria-label="طريقة الدفع: فودافون كاش">
                       <i class="fa-solid fa-mobile-screen-button"></i>
-                      <span>محفظة / إنستاباي</span>
-                    </button>
-                    <button class="pay-btn" data-method="split">
-                      <i class="fa-solid fa-layer-group"></i>
-                      <span>دفع مقسم (Split)</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Cash Calculator (Only for Cash) -->
-                <div id="pos-cash-calc-box">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <label style="font-size:0.8rem; font-weight:800; color:#92400e;">المبلغ المستلم من العميل:</label>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                      <input type="number" id="pos-cash-received" placeholder="0" min="0" style="width:85px; padding:4px 6px; border:1px solid #cbd5e1; border-radius:6px; font-family:var(--font-latin); font-weight:800; text-align:center;">
-                      <span style="font-size:0.75rem; font-weight:700;">ج.م</span>
-                    </div>
-                  </div>
-                  <div class="quick-cash-chips-row">
-                    <button type="button" class="btn-quick-cash" data-val="exact">المبلغ تماماً</button>
-                    <button type="button" class="btn-quick-cash" data-val="50">50</button>
-                    <button type="button" class="btn-quick-cash" data-val="100">100</button>
-                    <button type="button" class="btn-quick-cash" data-val="200">200</button>
-                    <button type="button" class="btn-quick-cash" data-val="500">500</button>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; border-top:1px dashed #fde68a; padding-top:4px;">
-                    <span style="font-weight:700; color:#475569;">الباقي للعميل:</span>
-                    <span id="pos-cash-change" style="font-weight:900; font-size:1.05rem; color:var(--success); font-family:var(--font-latin);">0 ج.م</span>
-                  </div>
-                </div>
-
-                <!-- Split Payment Box (Only for Split) -->
-                <div id="pos-split-calc-box" style="display:none; background:var(--bg-input); border:1px solid var(--border-gold); border-radius:10px; padding:10px; margin-top:8px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-size:0.8rem; font-weight:800; color:var(--gold-light);">
-                      <i class="fa-solid fa-calculator"></i> توزيع مبالغ الدفع:
-                    </span>
-                    <span id="pos-split-needed-label" style="font-size:0.8rem; font-weight:800; color:var(--text-main);">المطلوب: 0 ج.م</span>
-                  </div>
-                  <div style="display:flex; flex-direction:column; gap:6px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                      <label style="font-size:0.78rem; font-weight:700; display:flex; align-items:center; gap:5px;"><i class="fa-solid fa-money-bill-wave" style="color:var(--success);"></i> كاش نقدي:</label>
-                      <input type="number" id="split-cash-val" value="0" min="0" style="width:90px; padding:4px 8px; border:1px solid #cbd5e1; border-radius:6px; font-weight:800; text-align:center;">
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                      <label style="font-size:0.78rem; font-weight:700; display:flex; align-items:center; gap:5px;"><i class="fa-solid fa-credit-card" style="color:var(--info);"></i> بطاقة / فيزا:</label>
-                      <input type="number" id="split-card-val" value="0" min="0" style="width:90px; padding:4px 8px; border:1px solid #cbd5e1; border-radius:6px; font-weight:800; text-align:center;">
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                      <label style="font-size:0.78rem; font-weight:700; display:flex; align-items:center; gap:5px;"><i class="fa-solid fa-mobile-screen-button" style="color:var(--warning);"></i> محفظة / إنستاباي:</label>
-                      <input type="number" id="split-wallet-val" value="0" min="0" style="width:90px; padding:4px 8px; border:1px solid #cbd5e1; border-radius:6px; font-weight:800; text-align:center;">
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:2px;">
-                      <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">المتبقي للتغطية:</span>
-                      <span id="pos-split-remaining" style="font-weight:900; font-size:0.95rem; color:var(--danger); font-family:var(--font-latin);">0 ج.م</span>
+                      <span>فودافون كاش</span>
                     </div>
                   </div>
                 </div>
@@ -562,7 +509,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
             <div class="tabs-subnav" style="margin-bottom:0; border-bottom:none;">
               <button class="subnav-btn active" id="tab-btn-services-list">قائمة الخدمات</button>
-              <button class="subnav-btn" id="tab-btn-products-list">منتجات العناية (المخزون)</button>
+              <button class="subnav-btn" id="tab-btn-products-list">المنتجات</button>
             </div>
             <button class="btn-primary admin-only" id="btn-open-add-catalog-item">
               <i class="fa-solid fa-plus"></i>
@@ -576,8 +523,6 @@
               <thead>
                 <tr>
                   <th>اسم الخدمة</th>
-                  <th>التصنيف</th>
-                  <th>المدة التقريبية</th>
                   <th>السعر</th>
                   <th class="admin-only">الإجراءات</th>
                 </tr>
@@ -595,8 +540,6 @@
                 <tr>
                   <th>اسم المنتج</th>
                   <th>سعر البيع</th>
-                  <th class="admin-only">سعر التكلفة</th>
-                  <th>المخزون الحالي</th>
                   <th class="admin-only">الإجراءات</th>
                 </tr>
               </thead>
@@ -614,7 +557,7 @@
           <!-- Financial Totals -->
           <div class="reports-financial-grid">
             <div class="report-summary-box">
-              <h5>إجمالي المبيعات (اليوم)</h5>
+              <h5>إجمالي المبيعات (الوردية الحالية)</h5>
               <div class="amount" id="rep-total-revenue">0 ج.م</div>
             </div>
             <div class="report-summary-box">
@@ -622,11 +565,11 @@
               <div class="amount" style="color:var(--success);" id="rep-cash-in-drawer">0 ج.م</div>
             </div>
             <div class="report-summary-box">
-              <h5>المدفوعات الإلكترونية (فيزا / محفظة)</h5>
+              <h5>مدفوعات فودافون كاش</h5>
               <div class="amount" style="color:var(--info);" id="rep-digital-payments">0 ج.م</div>
             </div>
             <div class="report-summary-box">
-              <h5>المصروفات اليومية</h5>
+              <h5>مصروفات الوردية الحالية</h5>
               <div class="amount" style="color:var(--danger);" id="rep-total-expenses">0 ج.م</div>
             </div>
           </div>
@@ -649,6 +592,10 @@
               <i class="fa-solid fa-file-excel" style="color:#107c41;"></i>
               <span>إنتاجية الحلاقين (Excel)</span>
             </button>
+            <button class="btn-secondary" id="btn-export-shift-history" title="تصدير سجل الورديات والفواتير والمصروفات إلى Excel">
+              <i class="fa-solid fa-file-excel" style="color:#107c41;"></i>
+              <span>سجل الورديات (Excel)</span>
+            </button>
             <button class="btn-secondary" id="btn-export-backup">
               <i class="fa-solid fa-file-export"></i>
               <span>تصدير نسخة احتياطية (JSON)</span>
@@ -664,11 +611,21 @@
             </button>
           </div>
 
+          <div style="margin-bottom:28px;">
+            <h4 style="margin-bottom:12px; font-weight:800; color:var(--text-main);"><i class="fa-solid fa-clock-rotate-left"></i> سجل تقفيل الورديات</h4>
+            <div class="data-table-container">
+              <table class="custom-table">
+                <thead><tr><th>تاريخ الفتح</th><th>تاريخ الإغلاق</th><th>الفواتير</th><th>المبيعات</th><th>فودافون كاش</th><th>المصروفات</th><th>صافي الدرج</th></tr></thead>
+                <tbody id="shift-history-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- Barber Production / Sales Summary Table (100% Salon Revenue) -->
           <div style="margin-bottom:28px;">
             <h4 style="margin-bottom:12px; font-weight:800; color:var(--gold-light);">
               <i class="fa-solid fa-chart-pie"></i>
-              <span>تقرير إنتاجية ومبيعات الحلاقين للمحل اليوم (100% للمحل)</span>
+              <span>تقرير إنتاجية ومبيعات الحلاقين خلال الوردية (100% للمحل)</span>
             </h4>
             <div class="data-table-container">
               <table class="custom-table">
@@ -693,13 +650,14 @@
           <div>
             <h4 style="margin-bottom:12px; font-weight:800; color:var(--text-main);">
               <i class="fa-solid fa-receipt"></i>
-              <span>سجل الفواتير الصادرة اليوم</span>
+              <span>سجل جميع الفواتير</span>
             </h4>
             <div class="data-table-container">
               <table class="custom-table">
                 <thead>
                   <tr>
                     <th>رقم الفاتورة</th>
+                    <th>التاريخ</th>
                     <th>الوقت</th>
                     <th>العميل</th>
                     <th>الحلاق</th>
@@ -728,6 +686,16 @@
               <i class="fa-solid fa-user-plus"></i>
               <span>إضافة عميل جديد</span>
             </button>
+          </div>
+
+          <div class="settings-card" style="padding:16px; margin-bottom:18px;">
+            <h4 style="margin-bottom:8px;"><i class="fa-solid fa-gift"></i> مكافأة الولاء</h4>
+            <p style="color:var(--text-muted); margin-bottom:12px;">بعد عدد الزيارات المحدد، يظهر خصم تلقائي للعميل في الفاتورة التالية.</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+              <label>كل <input id="crm-loyalty-visits" type="number" min="1" max="100" value="5" style="width:76px;"> زيارات</label>
+              <label>خصم <input id="crm-loyalty-percent" type="number" min="1" max="100" value="10" style="width:76px;"> %</label>
+              <button class="btn-secondary admin-only" id="btn-save-loyalty-settings">حفظ نظام الولاء</button>
+            </div>
           </div>
 
           <!-- CRM Quick Stats -->
@@ -801,15 +769,6 @@
                 </div>
               </div>
 
-              <!-- Low Stock Panel -->
-              <div class="analytics-panel">
-                <div class="analytics-panel-header">
-                  <i class="fa-solid fa-box-open" style="color:var(--warning);"></i>
-                  <h4>حالة المخزون</h4>
-                </div>
-                <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;" id="analytics-stock-panel">
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -1077,14 +1036,14 @@
         <div style="background:var(--bg-input); padding:14px; border-radius:8px; border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:8px;">
           <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--border-subtle); padding-bottom:6px;">
             <span>مسؤول الكاشير والوردية:</span>
-            <span style="font-weight:800; color:var(--text-main);"><i class="fa-solid fa-user-check" style="color:var(--gold);"></i> حسام حارس</span>
+            <span style="font-weight:800; color:var(--text-main);" id="shift-modal-user"><i class="fa-solid fa-user-check" style="color:var(--gold);"></i> الكاشير</span>
           </div>
           <div style="display:flex; justify-content:space-between;">
             <span>إجمالي النقدية المتوقعة بالدرج:</span>
             <span style="font-weight:800; color:var(--gold-light);" id="shift-modal-cash">0 ج.م</span>
           </div>
           <div style="display:flex; justify-content:space-between;">
-            <span>المدفوعات الإلكترونية:</span>
+            <span>فودافون كاش:</span>
             <span style="font-weight:800; color:var(--info);" id="shift-modal-digital">0 ج.م</span>
           </div>
           <div style="display:flex; justify-content:space-between;">
@@ -1114,7 +1073,7 @@
       <div class="modal-body">
         <div class="form-group">
           <label>اسم الصالون / المحل</label>
-          <input type="text" class="form-control" id="set-shop-name" value="صالون سيد فرست (Sayed First)">
+          <input type="text" class="form-control" id="set-shop-name" value="صالون يوسف فريست (Youssef First)">
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -1449,7 +1408,7 @@
         <img src="assets/logo.jpg" alt="Logo" class="lock-logo-img">
         <div class="lock-icon-badge"><i class="fa-solid fa-lock"></i></div>
       </div>
-      <h2 style="font-weight:900; color:var(--gold-light); margin-top:10px;">صالون سيد فرست</h2>
+      <h2 style="font-weight:900; color:var(--gold-light); margin-top:10px;">صالون يوسف فريست</h2>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">النظام مقفل حالياً لحماية الخزينة والبيانات</p>
 
       <div class="lock-clock" id="lock-screen-clock">00:00:00</div>

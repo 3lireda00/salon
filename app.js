@@ -1,5 +1,5 @@
 /**
- * صالون سيد فرست (Sayed First) - Barbershop Reception & POS System
+ * صالون يوسف فريست (Youssef First) - Barbershop Reception & POS System
  * Core Application Engine & State Management
  */
 
@@ -10,7 +10,7 @@ const STORAGE_KEY = 'barbershop_data_v1';
 
 const DEFAULT_DATA = {
   settings: {
-    shopName: 'صالون سيد فرست (Sayed First)',
+    shopName: 'صالون يوسف فريست',
     shopPhone: '01032232541',
     shopAddress: 'الفيوم - سنهور القبلية - ميدان المفارق أول طريق مركز سنورس',
     currency: 'ج.م',
@@ -18,7 +18,9 @@ const DEFAULT_DATA = {
     soundEnabled: true,
     adminPin: '1234',
     currentRole: 'admin',
-    isLocked: false
+    isLocked: false,
+    loyaltyVisitThreshold: 5,
+    loyaltyDiscountPercent: 10
   },
   shift: {
     isOpen: true,
@@ -26,6 +28,7 @@ const DEFAULT_DATA = {
     startedAt: new Date().toISOString(),
     openingBalance: 500
   },
+  shiftClosings: [],
   barbers: [
     {
       id: 1,
@@ -147,26 +150,52 @@ const DEFAULT_DATA = {
     }
   ],
   services: [
-    { id: 101, name: 'قص شعر كلاسيكي وتصفيف', category: 'شعر', price: 120, duration: 30, icon: '✂️' },
-    { id: 102, name: 'قص شعر حديث (سكين فيد Fade)', category: 'شعر', price: 150, duration: 40, icon: '💈' },
-    { id: 103, name: 'تحديد وتشذيب اللحية بموس ساخن', category: 'لحية', price: 80, duration: 25, icon: '🪒' },
-    { id: 104, name: 'صبغة وتلوين اللحية والشعر الأبيض', category: 'لحية', price: 110, duration: 30, icon: '🎨' },
-    { id: 105, name: 'استشوار وغسيل مع مساج فروة الرأس', category: 'شعر', price: 60, duration: 20, icon: '💨' },
-    { id: 106, name: 'تنظيف بشرة عميق بجهاز البخار', category: 'بشرة', price: 160, duration: 45, icon: '🧖' },
-    { id: 107, name: 'ماسك الذهب الأسود وإزالة الرؤوس السوداء', category: 'بشرة', price: 90, duration: 25, icon: '✨' },
-    { id: 108, name: 'جلسة بروتين وكيراتين برازيلي معالج', category: 'شعر', price: 450, duration: 90, icon: '🧴' },
-    { id: 109, name: 'باقة VIP المتكاملة (شعر + لحية + بخار + ماسك)', category: 'باقات', price: 350, duration: 75, icon: '👑' },
-    { id: 110, name: 'باقة العريس الملكية الخاصة', category: 'باقات', price: 800, duration: 120, icon: '💎' }
+    { id: 1001, name: 'قص شعر', category: 'شعر', price: 150, duration: 30, icon: 'fa-scissors' },
+    { id: 1002, name: 'ماسك', category: 'عناية', price: 20, duration: 30, icon: 'fa-spa' },
+    { id: 1003, name: 'حلاقة ذقن موس', category: 'لحية', price: 60, duration: 30, icon: 'fa-scissors' },
+    { id: 1004, name: 'حلاقة ذقن ماكينة', category: 'لحية', price: 30, duration: 30, icon: 'fa-shop' },
+    { id: 1005, name: 'تدريج ذقن', category: 'لحية', price: 70, duration: 30, icon: 'fa-scissors' },
+    { id: 1006, name: 'استشوار', category: 'شعر', price: 70, duration: 30, icon: 'fa-wind' },
+    { id: 1007, name: 'جلسة سبا عادي', category: 'سبا', price: 100, duration: 30, icon: 'fa-spa' },
+    { id: 1008, name: 'جلسة سبا ديتوكس', category: 'سبا', price: 250, duration: 30, icon: 'fa-spa' },
+    { id: 1009, name: 'جلسة سبا VIP', category: 'سبا', price: 600, duration: 30, icon: 'fa-crown' },
+    { id: 1010, name: 'ساونا', category: 'عناية', price: 250, duration: 30, icon: 'fa-fire' },
+    { id: 1011, name: 'مشروب', category: 'إضافات', price: 0, duration: 30, icon: 'fa-glass-water' },
+    { id: 1012, name: 'حمام مغربي', category: 'عناية', price: 150, duration: 30, icon: 'fa-spa' },
+    { id: 1013, name: 'مانيكير كامل', category: 'عناية', price: 150, duration: 30, icon: 'fa-hand' },
+    { id: 1014, name: 'صبغة لون أسود شعر كامل', category: 'شعر', price: 150, duration: 30, icon: 'fa-palette' },
+    { id: 1015, name: 'حمام سنفرة', category: 'عناية', price: 350, duration: 30, icon: 'fa-spa' },
+    { id: 1016, name: 'واكسي', category: 'عناية', price: 70, duration: 30, icon: 'fa-star' },
+    { id: 1017, name: 'فتلة', category: 'عناية', price: 40, duration: 30, icon: 'fa-scissors' },
+    { id: 1018, name: 'جلسة بانثينول', category: 'عناية', price: 150, duration: 30, icon: 'fa-bottle-water' },
+    { id: 1019, name: 'جلسة النانو', category: 'شعر', price: 170, duration: 30, icon: 'fa-bottle-water' },
+    { id: 1020, name: 'كيراتين رجالي', category: 'شعر', price: 100, duration: 30, icon: 'fa-bottle-water' },
+    { id: 1021, name: 'قص شعر ودقن ماسك فيس', category: 'باقات', price: 200, duration: 30, icon: 'fa-shop' },
+    { id: 1022, name: 'سيشوار صغير', category: 'شعر', price: 180, duration: 30, icon: 'fa-wind' },
+    { id: 1023, name: 'بروتين', category: 'شعر', price: 600, duration: 30, icon: 'fa-bottle-water' },
+    { id: 1025, name: 'هاي لايت', category: 'شعر', price: 250, duration: 30, icon: 'fa-palette' },
+    { id: 1026, name: 'تحديد شعر ودقن ماسك فيس', category: 'باقات', price: 150, duration: 30, icon: 'fa-shop' },
+    { id: 1027, name: 'هاي لايت شعر كامل بيبي', category: 'شعر', price: 400, duration: 30, icon: 'fa-palette' },
+    { id: 1028, name: 'واكس', category: 'عناية', price: 50, duration: 30, icon: 'fa-star' },
+    { id: 1029, name: 'حمام كريم Bio B', category: 'شعر', price: 200, duration: 30, icon: 'fa-bottle-water' },
+    { id: 1101, name: 'عرض الملك', category: 'باقات', price: 350, duration: 60, icon: 'fa-crown' },
+    { id: 1102, name: 'عرض الخميس', category: 'باقات', price: 400, duration: 60, icon: 'fa-gift' },
+    { id: 1103, name: 'باكدج العريس مميز', category: 'باقات', price: 900, duration: 60, icon: 'fa-user-tie' },
+    { id: 1104, name: 'باكدج العريس خارجي', category: 'باقات', price: 1800, duration: 60, icon: 'fa-user-tie' },
+    { id: 1105, name: 'عرض باكدج العريس خارجي', category: 'باقات', price: 2200, duration: 60, icon: 'fa-user-tie' },
+    { id: 1106, name: 'عرض الانتعاش', category: 'باقات', price: 300, duration: 60, icon: 'fa-star' },
+    { id: 1107, name: 'باقة البرونز', category: 'باقات', price: 250, duration: 60, icon: 'fa-medal' },
+    { id: 1108, name: 'VIP باكدج العريس', category: 'باقات', price: 1500, duration: 60, icon: 'fa-crown' }
   ],
   products: [
-    { id: 201, name: 'حمام كريم (Hair Cream Bath)', category: 'منتجات', price: 90, cost: 45, stock: 15, icon: '🧖' },
-    { id: 202, name: 'سيرم مغذي وملمع للشعر', category: 'منتجات', price: 180, cost: 110, stock: 12, icon: '🧴' },
-    { id: 203, name: 'صبغة شعر ولحية احترافية', category: 'منتجات', price: 120, cost: 65, stock: 20, icon: '🎨' },
-    { id: 204, name: 'فوم تصفيف وتثبيت (Mousse)', category: 'منتجات', price: 110, cost: 60, stock: 14, icon: '💨' },
-    { id: 205, name: 'سبراي مثبت شعر قوي (Hair Spray)', category: 'منتجات', price: 130, cost: 75, stock: 18, icon: '✨' },
-    { id: 206, name: 'كريم شعر (مافيا Mafia)', category: 'منتجات', price: 140, cost: 80, stock: 16, icon: '💈' },
-    { id: 207, name: 'كريم شعر (عادي)', category: 'منتجات', price: 80, cost: 40, stock: 25, icon: '🧴' },
-    { id: 208, name: 'شمع تصفيف فاخر (Matte Wax)', category: 'منتجات', price: 160, cost: 95, stock: 15, icon: '📦' }
+    { id: 201, name: 'حمام كريم (Hair Cream Bath)', category: 'منتجات', price: 90, cost: 45, stock: 15, icon: 'fa-spa' },
+    { id: 202, name: 'سيرم مغذي وملمع للشعر', category: 'منتجات', price: 180, cost: 110, stock: 12, icon: 'fa-bottle-water' },
+    { id: 203, name: 'صبغة شعر ولحية احترافية', category: 'منتجات', price: 120, cost: 65, stock: 20, icon: 'fa-palette' },
+    { id: 204, name: 'فوم تصفيف وتثبيت (Mousse)', category: 'منتجات', price: 110, cost: 60, stock: 14, icon: 'fa-wind' },
+    { id: 205, name: 'سبراي مثبت شعر قوي (Hair Spray)', category: 'منتجات', price: 130, cost: 75, stock: 18, icon: 'fa-star' },
+    { id: 206, name: 'كريم شعر (مافيا Mafia)', category: 'منتجات', price: 140, cost: 80, stock: 16, icon: 'fa-shop' },
+    { id: 207, name: 'كريم شعر (عادي)', category: 'منتجات', price: 80, cost: 40, stock: 25, icon: 'fa-bottle-water' },
+    { id: 208, name: 'شمع تصفيف فاخر (Matte Wax)', category: 'منتجات', price: 160, cost: 95, stock: 15, icon: 'fa-box' }
   ],
   queue: [
     {
@@ -270,7 +299,7 @@ class SalonState {
     this.ticketCounter = 104;
     this.cart = [];
     this.cartDiscount = 0;
-    this.cartPaymentMethod = 'cash';
+    this.cartPaymentMethod = 'vodafone_cash';
     this.activeView = 'view-chairs';
     this.pendingChairAssign = null; // if transferring client to chair
     this.broadcastChannel = null;
@@ -290,9 +319,37 @@ class SalonState {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
+        parsed.shiftClosings = Array.isArray(parsed.shiftClosings) ? parsed.shiftClosings : [];
+        // Replace only the old built-in demo catalog. Keep any services the salon added itself.
+        const oldDemoServices = new Set([
+          'قص شعر كلاسيكي وتصفيف', 'قص شعر حديث (سكين فيد Fade)',
+          'تحديد وتشذيب اللحية بموس ساخن', 'صبغة وتلوين اللحية والشعر الأبيض',
+          'استشوار وغسيل مع مساج فروة الرأس', 'تنظيف بشرة عميق بجهاز البخار',
+          'ماسك الذهب الأسود وإزالة الرؤوس السوداء', 'جلسة بروتين وكيراتين برازيلي معالج',
+          'باقة VIP المتكاملة (شعر + لحية + بخار + ماسك)', 'باقة العريس الملكية الخاصة'
+        ]);
+        if (parsed._realCatalogVersion !== 'sayed_first_photo_catalog_v1') {
+          const savedServices = Array.isArray(parsed.services) ? parsed.services : [];
+          parsed.services = savedServices.filter(s => !oldDemoServices.has(s.name));
+          DEFAULT_DATA.services.forEach(realService => {
+            const existingIdx = parsed.services.findIndex(s => s.name === realService.name);
+            if (existingIdx >= 0) {
+              parsed.services[existingIdx] = { ...parsed.services[existingIdx], ...realService, id: parsed.services[existingIdx].id };
+            } else {
+              parsed.services.push(JSON.parse(JSON.stringify(realService)));
+            }
+          });
+          parsed._realCatalogVersion = 'sayed_first_photo_catalog_v1';
+        }
+
         if (parsed.settings) {
+          if (typeof parsed.settings.shopName === 'string' && parsed.settings.shopName.includes('سيد فرست')) {
+            parsed.settings.shopName = parsed.settings.shopName.replaceAll('سيد فرست', 'يوسف فريست').replaceAll('Sayed First', 'Youssef First');
+          }
+          parsed.settings.loyaltyVisitThreshold = Math.max(1, Number(parsed.settings.loyaltyVisitThreshold) || 5);
+          parsed.settings.loyaltyDiscountPercent = Math.min(100, Math.max(1, Number(parsed.settings.loyaltyDiscountPercent) || 10));
           if (!parsed.settings.shopName || parsed.settings.shopName.includes('الراقي') || parsed.settings.shopName.includes('Golden Blade')) {
-            parsed.settings.shopName = 'صالون سيد فرست (Sayed First)';
+            parsed.settings.shopName = 'صالون يوسف فريست (Youssef First)';
           }
           if (!parsed.settings.shopAddress || parsed.settings.shopAddress.includes('التحرير') || parsed.settings.shopAddress.includes('وسط البلد')) {
             parsed.settings.shopAddress = 'الفيوم - سنهور القبلية - ميدان المفارق أول طريق مركز سنورس';
@@ -308,6 +365,7 @@ class SalonState {
 
         // Automatic cashier update to Hossam Hares
         if (!parsed.shift) parsed.shift = { isOpen: true, cashier: 'حسام حارس', openingBalance: 500 };
+        if (!parsed.shift.startedAt) parsed.shift.startedAt = new Date().toISOString();
         if (!parsed.shift.cashier || parsed.shift.cashier.includes('أحمد') || parsed.shift.cashier === 'الاستقبال') {
           parsed.shift.cashier = 'حسام حارس';
         }
@@ -558,7 +616,7 @@ function switchView(viewId, bypassAuth = false) {
     'view-services': {
       title: 'كتالوج الخدمات ومنتجات العناية',
       subtitle: 'تعديل أسعار الخدمات وإدارة كميات المنتجات بالمخزون',
-      icon: 'fa-spray-can-sparkles'
+      icon: 'fa-spray-can'
     },
     'view-reports': {
       title: 'الخزينة والتقارير وتقفيل الوردية',
@@ -578,7 +636,7 @@ function switchView(viewId, bypassAuth = false) {
   };
 
   const headerInfo = viewHeaders[viewId] || {
-    title: 'صالون سيد فرست',
+    title: 'صالون يوسف فريست',
     subtitle: 'نظام إدارة الاستقبال ونقطة البيع',
     icon: 'fa-scissors'
   };
@@ -677,7 +735,11 @@ window.closeModal = closeModal;
 
 function formatCurrency(amount) {
   const curr = state.data.settings.currency || 'ج.م';
-  return `${Number(amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${curr}`;
+  return `${Number(amount).toLocaleString('ar-EG', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${curr}`;
+}
+
+function formatNumber(value) {
+  return Number(value || 0).toLocaleString('ar-EG');
 }
 
 // Elegant Toast Notification System
@@ -741,9 +803,9 @@ function renderTopMetrics() {
   const totalChairs = state.data.chairs.length;
   const waitingCount = (state.data.queue || []).length;
 
-  document.getElementById('stat-today-clients').textContent = totalClients;
-  document.getElementById('stat-waiting-now').textContent = waitingCount;
-  document.getElementById('stat-chairs-active').textContent = `${busyChairs} / ${totalChairs}`;
+  document.getElementById('stat-today-clients').textContent = formatNumber(totalClients);
+  document.getElementById('stat-waiting-now').textContent = formatNumber(waitingCount);
+  document.getElementById('stat-chairs-active').textContent = `${formatNumber(busyChairs)} / ${formatNumber(totalChairs)}`;
 
   // Revenue Metric: Hidden for Cashier (via CSS .admin-only), populated for Admin
   const revEl = document.getElementById('stat-today-revenue');
@@ -757,8 +819,8 @@ function renderTopMetrics() {
   }
 
   // Badge counts
-  document.getElementById('badge-queue-count').textContent = waitingCount;
-  document.getElementById('queue-header-count').textContent = waitingCount;
+  document.getElementById('badge-queue-count').textContent = formatNumber(waitingCount);
+  document.getElementById('queue-header-count').textContent = formatNumber(waitingCount);
 
   // Drawer Cash (Supports both single cash and split payments)
   const totalCash = todayInvoices.reduce((sum, inv) => {
@@ -776,154 +838,99 @@ function renderTopMetrics() {
   const drawerLabel = document.getElementById('sidebar-drawer-label');
   if (drawerEl && !isCashier) {
     drawerEl.textContent = formatCurrency(netCashInDrawer);
+    const headerDrawerEl = document.getElementById('header-drawer-val');
+    if (headerDrawerEl) headerDrawerEl.textContent = formatCurrency(netCashInDrawer);
     if (drawerLabel) drawerLabel.textContent = 'خزينة النقدية:';
   }
 
-  document.getElementById('chairs-summary-text').textContent = `${busyChairs} كراسي مشغولة من أصل ${totalChairs}`;
+  document.getElementById('chairs-summary-text').textContent = `${formatNumber(busyChairs)} كراسي مشغولة من أصل ${formatNumber(totalChairs)}`;
 }
 
 // ------------------------------------------
 // View 1: Chairs Grid & Queue List
 // ------------------------------------------
+function escH(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 function renderChairsGrid() {
   const container = document.getElementById('chairs-container');
   if (!container) return;
-  container.innerHTML = '';
 
-  state.data.chairs.forEach(chair => {
+  container.innerHTML = state.data.chairs.map(chair => {
     const barber = state.data.barbers.find(b => b.id === chair.barberId) || { name: 'غير محدد', avatar: 'assets/logo.jpg' };
     const isBusy = chair.status === 'busy' && chair.currentClient;
     const isMaster = chair.id === 6 || chair.isMaster || (barber && (barber.isMaster || (barber.name && barber.name.includes('يوسف فرست'))));
+    const services = isBusy ? (chair.currentClient.services || ['خدمة عامة']) : [];
 
-    const card = document.createElement('div');
-    card.className = `chair-card ${isBusy ? 'busy' : 'available'} ${isMaster ? 'master-chair' : ''}`;
-    card.innerHTML = `
-      <div class="chair-header">
-        <div class="chair-number-tag">
-          <div class="chair-icon-badge ${isMaster ? 'master-icon-badge' : ''}">
-            <i class="fa-solid ${isMaster ? 'fa-star' : 'fa-chair'}"></i>
-          </div>
-          <div>
-            <div class="chair-name ${isMaster ? 'master-chair-name' : ''}">
-              ${chair.name || ('كرسي رقم ' + chair.id)}
-              ${isMaster ? '<span class="master-tag-pill"><i class="fa-solid fa-star"></i> سينيور باربر</span>' : ''}
-            </div>
-            <div style="font-size:0.75rem; color:${isMaster ? 'var(--gold)' : 'var(--gold-light)'}; font-weight:700;">
-              <i class="fa-solid ${isMaster ? 'fa-scissors' : 'fa-scissors'}"></i> ${barber.name} ${isMaster ? '(سينيور باربر)' : ''}
-            </div>
-          </div>
+    return `
+    <article class="c-card ${isBusy ? 'is-busy' : 'is-free'} ${isMaster ? 'is-master' : ''}">
+      <header class="c-head">
+        <div class="c-title">
+          <span class="c-name">${escH(chair.name || ('كرسي رقم ' + chair.id))}</span>
+          ${isMaster ? '<span class="c-star"><i class="fa-solid fa-star"></i> سينيور</span>' : ''}
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <button class="btn-chair-action" style="padding:4px 8px; font-size:0.78rem; background:rgba(0,0,0,0.04); border:1px solid var(--border-subtle); border-radius:6px; cursor:pointer;" onclick="openEditChairModal(${chair.id})" title="تعديل اسم الكرسي والحلاق المخصص">
-            <i class="fa-solid fa-pen"></i>
-          </button>
-          <div class="chair-status-pill ${isBusy ? 'busy' : 'available'} ${isMaster ? 'master-status-pill' : ''}">
-            <span class="pulse-dot" style="background:${isBusy ? 'var(--danger)' : 'var(--success)'}; width:6px; height:6px;"></span>
-            ${isBusy ? 'مشغول' : 'شاغر ومتاح'}
-          </div>
+        <div class="c-tools">
+          <span class="c-state"><i></i>${isBusy ? 'مشغول' : 'متاح'}</span>
+          <button class="c-icon" onclick="openEditChairModal(${chair.id})" title="تعديل اسم الكرسي والحلاق المخصص"><i class="fa-solid fa-pen"></i></button>
         </div>
-      </div>
-
-      <div class="chair-body-content">
+      </header>
+      <div class="c-barber"><i class="fa-solid fa-scissors"></i>${escH(barber.name)}</div>
+      <div class="c-body">
         ${isBusy ? `
-          <div class="client-in-chair-box ${isMaster ? 'master-client-box' : ''}">
-            <div class="client-in-chair-top">
-              <span class="client-name-bold">${chair.currentClient.name}</span>
-              ${isMaster ? '<span class="master-vip-guest-tag"><i class="fa-solid fa-star"></i> سينيور باربر</span>' : ''}
-            </div>
-            <div class="services-tags-list">
-              ${(chair.currentClient.services || ['خدمة عامة']).map(s => `<span class="service-tag ${isMaster ? 'master-service-tag' : ''}">${s}</span>`).join('')}
-            </div>
-          </div>
-        ` : `
-          <div class="chair-empty-state">
-            <i class="fa-solid fa-scissors" style="font-size:1.85rem; margin-bottom:8px; opacity:0.45; color:var(--gold); display:inline-block; transform:rotate(-45deg);"></i>
-            <p>الكرسي جاهز لاستقبال العميل التالي</p>
-            ${isMaster ? '<span style="font-size:0.75rem; color:var(--gold); font-weight:700;"><i class="fa-solid fa-star"></i> سينيور باربر • يوسف فرست</span>' : ''}
-          </div>
-        `}
+          <div class="c-client">${escH(chair.currentClient.name)}</div>
+          <div class="c-tags">${services.map(s => `<span>${escH(s)}</span>`).join('')}</div>
+        ` : `<div class="c-empty">جاهز لاستقبال العميل التالي</div>`}
       </div>
-
-      <div class="chair-actions-row">
+      <footer class="c-actions">
         ${isBusy ? `
-          <button class="btn-chair-action btn-chair-finish ${isMaster ? 'btn-master-action' : ''}" onclick="finishChairService(${chair.id})">
-            <i class="fa-solid fa-cash-register"></i>
-            <span>إنهاء والحساب</span>
-          </button>
-          <button class="btn-chair-action" style="background:#f1f5f9; color:var(--text-main); padding:6px 10px;" onclick="openTransferChairModal(${chair.id})" title="نقل العميل لكرسي آخر">
-            <i class="fa-solid fa-arrows-rotate"></i>
-            <span>نقل</span>
-          </button>
-          <button class="btn-chair-action btn-chair-more" title="تفريغ الكرسي مباشرة بدون دفع" onclick="freeUpChairDirectly(${chair.id})">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <button class="c-btn c-primary" onclick="finishChairService(${chair.id})"><i class="fa-solid fa-cash-register"></i>إنهاء والحساب</button>
+          <button class="c-btn" onclick="openTransferChairModal(${chair.id})" title="نقل العميل لكرسي آخر"><i class="fa-solid fa-arrows-rotate"></i>نقل</button>
+          <button class="c-btn c-square" onclick="freeUpChairDirectly(${chair.id})" title="تفريغ الكرسي مباشرة بدون دفع"><i class="fa-solid fa-xmark"></i></button>
         ` : `
-          <button class="btn-chair-action btn-chair-assign ${isMaster ? 'btn-master-action' : ''}" onclick="promptSeatNextClient(${chair.id})">
-            <i class="fa-solid fa-user-plus"></i>
-            <span>إجلاس العميل التالي</span>
-          </button>
+          <button class="c-btn c-primary" onclick="promptSeatNextClient(${chair.id})"><i class="fa-solid fa-user-plus"></i>إجلاس العميل التالي</button>
         `}
-      </div>
-    `;
-    container.appendChild(card);
-  });
+      </footer>
+    </article>`;
+  }).join('');
 }
 
 function renderQueueList() {
   const container = document.getElementById('queue-items-container');
   if (!container) return;
-  container.innerHTML = '';
 
   const queue = state.data.queue || [];
   if (queue.length === 0) {
     container.innerHTML = `
-      <div style="text-align:center; padding:50px 20px; color:var(--text-dim);">
-        <i class="fa-regular fa-clock" style="font-size:2.2rem; margin-bottom:10px; opacity:0.4;"></i>
-        <p style="font-weight:700;">طابور الانتظار فارغ</p>
-        <span style="font-size:0.8rem; color:var(--text-muted);">انقر على "تسجيل عميل جديد" لإضافة عميل</span>
-      </div>
-    `;
+      <div class="q-empty">
+        <i class="fa-regular fa-clock"></i>
+        <strong>طابور الانتظار فارغ</strong>
+        <span>اضغط "تسجيل عميل جديد" لإضافة عميل</span>
+      </div>`;
     return;
   }
 
-  queue.forEach((item, idx) => {
+  container.innerHTML = queue.map((item, idx) => {
     const estWait = (idx + 1) * 15;
-
-    const card = document.createElement('div');
-    card.className = `queue-item-card ${item.isVip ? 'vip' : ''}`;
-    card.innerHTML = `
-      <div class="queue-item-top">
-        <div style="display:flex; align-items:center;">
-          <span class="queue-ticket-badge">${item.ticket}</span>
-          <span class="queue-cust-name">${item.name}</span>
-          ${item.isVip ? '<span class="vip-tag">VIP</span>' : ''}
+    const svc = item.services ? item.services.slice(0, 2).map(escH).join('، ') : '';
+    return `
+    <div class="q-card ${item.isVip ? 'is-vip' : ''}">
+      <div class="q-main">
+        <span class="q-no">${escH(item.ticket)}</span>
+        <div class="q-info">
+          <div class="q-name">${escH(item.name)}${item.isVip ? '<em>VIP</em>' : ''}</div>
+          <div class="q-sub">${svc || '&nbsp;'}</div>
         </div>
-        <div class="queue-wait-est"><i class="fa-regular fa-hourglass"></i> ${estWait} د</div>
+      <span class="q-eta"><i class="fa-regular fa-hourglass"></i>${formatNumber(estWait)} د</span>
       </div>
-
-      <div class="queue-meta-row">
-        <span style="font-size:0.75rem; color:var(--text-dim);">${item.services ? item.services.slice(0, 2).join('، ') : ''}</span>
+      <div class="q-actions">
+        <button class="q-btn q-seat" onclick="openAssignChairModal('${item.id}')"><i class="fa-solid fa-chair"></i>إجلاس</button>
+        <button class="q-btn" onclick="callQueueClient('${item.id}')" title="نداء صوتي للعميل"><i class="fa-solid fa-bullhorn"></i>نداء</button>
+        <button class="q-btn q-square" onclick="postponeQueueClient('${item.id}')" title="تأجيل الدور لآخر الطابور"><i class="fa-solid fa-angles-down"></i></button>
+        <button class="q-btn q-square q-del" onclick="removeQueueClient('${item.id}')" title="حذف من الانتظار"><i class="fa-solid fa-trash-can"></i></button>
       </div>
-
-      <div class="queue-item-actions">
-        <button class="btn-queue-seat" onclick="openAssignChairModal('${item.id}')" title="إجلاس على كرسي">
-          <i class="fa-solid fa-chair"></i>
-          <span>إجلاس</span>
-        </button>
-        <button class="btn-queue-call" onclick="callQueueClient('${item.id}')" title="نداء صوتي للعميل">
-          <i class="fa-solid fa-bullhorn"></i>
-          <span>نداء</span>
-        </button>
-        <button class="btn-queue-del" style="background:#fef3c7; color:#b45309;" onclick="postponeQueueClient('${item.id}')" title="تأجيل الدور لآخر الطابور">
-          <i class="fa-solid fa-angles-down"></i>
-        </button>
-        <button class="btn-queue-del" onclick="removeQueueClient('${item.id}')" title="حذف من الانتظار">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+    </div>`;
+  }).join('');
 }
 
 // ------------------------------------------
@@ -989,15 +996,17 @@ function renderPosCatalog() {
     card.className = 'pos-item-card';
     card.onclick = () => addItemToCart(item);
 
-    const catBadge = item.category === 'منتجات' ? '📦 منتج' : `💈 ${item.category}`;
-    const subText = item.duration ? `⏳ المدة: ${item.duration} دقيقة` : (item.stock !== undefined ? `المتوفر بالمخزن: ${item.stock} قطعة` : '');
+    const catIcon = item.category === 'منتجات' ? 'fa-box' : 'fa-scissors';
+    const catBadge = `<i class="fa-solid ${catIcon}"></i> ${item.category === 'منتجات' ? 'منتج' : item.category}`;
+    const subText = item.duration ? `المدة: ${item.duration} دقيقة` : '';
+    const itemIcon = /^fa-[a-z0-9-]+$/.test(item.icon || '') ? item.icon : (item.category === 'منتجات' ? 'fa-bottle-water' : 'fa-scissors');
 
     card.innerHTML = `
       <div>
-        <div class="pos-item-top-row">
-          <div class="pos-item-icon">${item.icon || '💈'}</div>
-          <span class="pos-item-cat-badge">${catBadge}</span>
-        </div>
+      <div class="pos-item-top-row">
+        <div class="pos-item-icon"><i class="fa-solid ${itemIcon}"></i></div>
+        <span class="pos-item-cat-badge">${catBadge}</span>
+      </div>
         <div class="pos-item-title">${item.name}</div>
         <div class="pos-item-dur">${subText}</div>
       </div>
@@ -1019,7 +1028,7 @@ function renderPosBarberOptions() {
       const opt = document.createElement('option');
       opt.value = b.id;
       opt.textContent = isMaster
-        ? `⭐ ${b.name} - سينيور باربر (كرسي ${b.chairId || 6})`
+        ? ` ${b.name} - سينيور باربر (كرسي ${b.chairId || 6})`
         : `${b.name} (كرسي ${b.chairId || 1})`;
       select.appendChild(opt);
     });
@@ -1128,6 +1137,12 @@ function renderPosCart() {
   }
 
   if (state.cart.length === 0) {
+    const discountInput = document.getElementById('cart-discount-input');
+    if (discountInput) {
+      discountInput.value = '0';
+      delete discountInput.dataset.loyaltyReward;
+      delete discountInput.dataset.loyaltyCustomerId;
+    }
     container.innerHTML = `
       <div class="cart-empty-prompt">
         <i class="fa-solid fa-cart-shopping" style="font-size:2.8rem; color:var(--gold); opacity:0.4;"></i>
@@ -1175,6 +1190,7 @@ function renderPosCart() {
     container.appendChild(row);
   });
 
+  syncLoyaltyDiscount(subtotal);
   const discount = Math.max(0, parseFloat(document.getElementById('cart-discount-input')?.value || 0));
   const tip = Math.max(0, parseFloat(document.getElementById('cart-tip-input')?.value || 0));
   const grandTotal = Math.max(0, subtotal - discount) + tip;
@@ -1190,7 +1206,6 @@ function renderPosCart() {
   }
 
   updatePosCashCalculator();
-  updateSplitPaymentCalculations();
 }
 
 function addItemToCart(item) {
@@ -1222,6 +1237,55 @@ function changeCartQty(index, delta) {
 function removeCartItem(index) {
   state.cart.splice(index, 1);
   renderPosCart();
+}
+
+function normalizeCustomerPhone(phone) {
+  return String(phone || '').replace(/\D/g, '').replace(/^20/, '0');
+}
+
+function findCustomerByPhone(phone) {
+  const normalized = normalizeCustomerPhone(phone);
+  if (!normalized) return null;
+  return (state.data.customers || []).find(c => normalizeCustomerPhone(c.phone) === normalized) || null;
+}
+
+function getLoyaltyReward(customer) {
+  if (!customer) return null;
+  const visits = Math.max(0, Number(customer.totalVisits) || 0);
+  const redeemedAt = Math.max(0, Number(customer.lastLoyaltyRewardVisits) || 0);
+  const threshold = Math.max(1, Number(state.data.settings.loyaltyVisitThreshold) || 5);
+  if (visits < threshold || visits - redeemedAt < threshold) return null;
+  return {
+    visits,
+    threshold,
+    percent: Math.min(100, Math.max(1, Number(state.data.settings.loyaltyDiscountPercent) || 10))
+  };
+}
+
+function syncLoyaltyDiscount(subtotal) {
+  const discountInput = document.getElementById('cart-discount-input');
+  const phone = document.getElementById('pos-client-phone')?.value || '';
+  if (!discountInput) return;
+
+  const previousReward = Number(discountInput.dataset.loyaltyRewardAmount) || 0;
+  const currentDiscount = Math.max(0, Number(discountInput.value) || 0);
+  const manualDiscount = previousReward > 0 ? Math.max(0, currentDiscount - previousReward) : currentDiscount;
+  const customer = findCustomerByPhone(phone);
+  const reward = getLoyaltyReward(customer);
+
+  if (!reward || subtotal <= 0) {
+    discountInput.value = String(manualDiscount);
+    delete discountInput.dataset.loyaltyRewardAmount;
+    delete discountInput.dataset.loyaltyRewardVisits;
+    delete discountInput.dataset.loyaltyRewardPhone;
+    return;
+  }
+
+  const rewardAmount = Math.min(subtotal, Math.round(subtotal * reward.percent / 100));
+  discountInput.value = String(manualDiscount + rewardAmount);
+  discountInput.dataset.loyaltyRewardAmount = String(rewardAmount);
+  discountInput.dataset.loyaltyRewardVisits = String(reward.visits);
+  discountInput.dataset.loyaltyRewardPhone = normalizeCustomerPhone(phone);
 }
 
 // ------------------------------------------
@@ -1257,7 +1321,7 @@ function renderAppointments() {
     if (apt.phone) {
       let rawPhone = apt.phone.replace(/[^0-9]/g, '');
       if (rawPhone.startsWith('0')) rawPhone = '2' + rawPhone;
-      const waMsg = encodeURIComponent(`مرحباً أستاذ ${apt.name}، يسعدنا تذكيركم بموعدكم في ${state.data.settings.shopName} اليوم في تمام الساعة ${apt.time} مع الكابتن ${barber.name}. نتمنى لكم يوماً رائعاً ومظهراً أنيقاً دائماً! 💈✨`);
+      const waMsg = encodeURIComponent(`مرحباً أستاذ ${apt.name}، يسعدنا تذكيركم بموعدكم في ${state.data.settings.shopName} اليوم في تمام الساعة ${apt.time} مع الكابتن ${barber.name}. نتمنى لكم يوماً رائعاً ومظهراً أنيقاً دائماً! `);
       waButton = `
         <a href="https://wa.me/${rawPhone}?text=${waMsg}" target="_blank" class="btn-whatsapp-direct" title="إرسال تذكير واتساب فوري">
           <i class="fa-brands fa-whatsapp"></i> واتساب
@@ -1313,38 +1377,14 @@ function renderBarbersList() {
   if (!container) return;
   container.innerHTML = '';
 
-  const currentRole = state.data.settings?.currentRole || 'admin';
-  const isCashier = currentRole === 'cashier';
-
   state.data.barbers.forEach(barber => {
-    // Calculate today's barber revenue and clients from invoices
-    const barberInvoices = (state.data.invoices || []).filter(inv => inv.barberId == barber.id);
-    const todayRev = barberInvoices.reduce((sum, inv) => sum + inv.total, 0);
-    const todayClients = barberInvoices.length;
-    const isMaster = barber.id === 6 || barber.isMaster || (barber.name && barber.name.includes('يوسف فرست'));
-
     const card = document.createElement('div');
-    card.className = `barber-profile-card ${isMaster ? 'master-barber-card' : ''}`;
+    card.className = 'barber-profile-card';
     card.innerHTML = `
-      ${isMaster ? `<div class="master-barber-badge-top"><i class="fa-solid fa-star"></i> سينيور باربر</div>` : ''}
-      <img src="${barber.avatar || 'assets/logo.jpg'}" alt="${barber.name}" class="barber-card-img ${isMaster ? 'master-card-img' : ''}">
-      <h4 class="barber-card-name" style="${isMaster ? 'color:var(--text-main); font-weight:800;' : ''}">${barber.name} ${isMaster ? '<span style="color:#d97706; font-size:0.8rem;">⭐</span>' : ''}</h4>
-      <div class="barber-card-chair" style="${isMaster ? 'color:var(--gold); font-weight:700;' : ''}"><i class="fa-solid fa-chair"></i> مخصص لكرسي رقم ${barber.chairId || 6}</div>
-      <p style="font-size:0.8rem; color:${isMaster ? 'var(--gold)' : 'var(--text-muted)'}; margin-bottom:14px; font-weight:${isMaster ? '600' : 'normal'};">${barber.title || 'حلاق محترف'}</p>
-
-      <div class="barber-stats-box">
-        <div class="barber-stat-item">
-          <span class="barber-stat-lbl">الزبائن اليوم</span>
-          <span class="barber-stat-val">${todayClients}</span>
-        </div>
-        <div class="barber-stat-item">
-          <span class="barber-stat-lbl">دخل المحل اليوم</span>
-          <span class="barber-stat-val gold">${formatCurrency(todayRev)}</span>
-        </div>
-      </div>
+      <h4 class="barber-card-name">${barber.name}</h4>
 
       <div class="admin-only" style="display:flex; gap:8px; width:100%; margin-top:8px;">
-        <button class="btn-primary ${isMaster ? 'btn-master-action' : ''}" style="flex:1; font-size:0.82rem; padding:8px 12px;" onclick="openEditBarberModal(${barber.id})">
+        <button class="btn-primary" style="flex:1; font-size:0.82rem; padding:8px 12px;" onclick="openEditBarberModal(${barber.id})">
           <i class="fa-solid fa-pen-to-square"></i> تعديل البيانات
         </button>
         <button class="btn-danger" style="font-size:0.82rem; padding:8px 12px;" onclick="deleteBarber(${barber.id})" title="حذف الحلاق">
@@ -1426,7 +1466,7 @@ function openEditChairModal(chairId) {
     barberSelect.innerHTML = '<option value="">-- بدون حلاق مخصص (أي حلاق) --</option>' +
       state.data.barbers.map(b => {
         const isM = b.id === 6 || b.isMaster || (b.name && b.name.includes('يوسف فرست'));
-        return `<option value="${b.id}" ${b.id === chair.barberId ? 'selected' : ''}>${isM ? '⭐ ' : ''}${b.name} (${b.title || 'حلاق'})</option>`;
+        return `<option value="${b.id}" ${b.id === chair.barberId ? 'selected' : ''}>${isM ? ' ' : ''}${b.name} (${b.title || 'حلاق'})</option>`;
       }).join('');
   }
 
@@ -1452,7 +1492,7 @@ function openAddChairModal() {
     barberSelect.innerHTML = '<option value="">-- بدون حلاق مخصص (أي حلاق) --</option>' +
       state.data.barbers.map(b => {
         const isM = b.id === 6 || b.isMaster || (b.name && b.name.includes('يوسف فرست'));
-        return `<option value="${b.id}">${isM ? '⭐ ' : ''}${b.name} (${b.title || 'حلاق'})</option>`;
+        return `<option value="${b.id}">${isM ? ' ' : ''}${b.name} (${b.title || 'حلاق'})</option>`;
       }).join('');
   }
 
@@ -1473,9 +1513,7 @@ function renderServicesTable() {
   state.data.services.forEach(srv => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><strong>${srv.icon || '💈'} ${srv.name}</strong></td>
-      <td><span class="service-tag">${srv.category}</span></td>
-      <td><i class="fa-regular fa-clock"></i> ${srv.duration} دقيقة</td>
+      <td><strong>${srv.name}</strong></td>
       <td><strong style="color:var(--gold-light); font-family:var(--font-latin);">${formatCurrency(srv.price)}</strong></td>
       <td class="admin-only">
         <button class="btn-cart-remove" onclick="deleteCatalogService(${srv.id})" title="حذف الخدمة">
@@ -1495,12 +1533,8 @@ function renderProductsTable() {
   state.data.products.forEach(prod => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><strong>${prod.icon || '📦'} ${prod.name}</strong></td>
+      <td><strong>${prod.name}</strong></td>
       <td><strong style="color:var(--gold-light); font-family:var(--font-latin);">${formatCurrency(prod.price)}</strong></td>
-      <td class="admin-only" style="color:var(--text-muted); font-family:var(--font-latin);">${formatCurrency(prod.cost || 0)}</td>
-      <td>
-        <span class="nav-badge ${prod.stock < 5 ? 'danger' : ''}">${prod.stock} قطعة</span>
-      </td>
       <td class="admin-only">
         <button class="btn-cart-remove" onclick="deleteCatalogProduct(${prod.id})" title="حذف المنتج">
           <i class="fa-solid fa-trash-can"></i>
@@ -1514,10 +1548,148 @@ function renderProductsTable() {
 // ------------------------------------------
 // View 6: Reports & Register
 // ------------------------------------------
-function renderReportsView() {
-  const allInvoices = state.data.invoices || [];
-  const activeInvoices = allInvoices.filter(inv => !inv.isVoided);
+function getCurrentShiftWindow() {
+  const start = new Date(state.data.shift?.startedAt || Date.now()).getTime();
+  const end = Date.now();
+  const inWindow = value => {
+    const time = new Date(value || 0).getTime();
+    return Number.isFinite(time) && time >= start && time <= end;
+  };
+  return { start, end, inWindow };
+}
+
+function buildShiftClosingRecord(notes = '') {
+  const closedAt = new Date().toISOString();
+  const openedAt = state.data.shift?.startedAt || closedAt;
+  const startMs = new Date(openedAt).getTime();
+  const endMs = new Date(closedAt).getTime();
+  const withinShift = value => {
+    const time = new Date(value || 0).getTime();
+    return Number.isFinite(time) && time >= startMs && time <= endMs;
+  };
+  const invoices = (state.data.invoices || []).filter(inv => withinShift(inv.timestamp));
+  const activeInvoices = invoices.filter(inv => !inv.isVoided);
+  const expenses = (state.data.expenses || []).filter(exp => withinShift(exp.timestamp || exp.createdAt));
+  const revenue = activeInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
+  const vodafoneCash = activeInvoices.filter(inv => inv.paymentMethod === 'vodafone_cash').reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
+  const cash = activeInvoices.reduce((sum, inv) => {
+    if (inv.paymentMethod === 'cash') return sum + (Number(inv.total) || 0);
+    if (inv.paymentMethod === 'split' && inv.paymentSplit) return sum + (Number(inv.paymentSplit.cash) || 0);
+    return sum;
+  }, 0);
+  const expenseTotal = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+  const openingBalance = Number(state.data.shift?.openingBalance) || 0;
+
+  return {
+    id: `shift_${Date.now()}`,
+    cashier: state.data.shift?.cashier || 'الكاشير',
+    openedAt,
+    closedAt,
+    openingBalance,
+    revenue,
+    vodafoneCash,
+    cash,
+    expenseTotal,
+    netDrawer: Math.max(0, openingBalance + cash - expenseTotal),
+    activeInvoiceCount: activeInvoices.length,
+    voidedInvoiceCount: invoices.length - activeInvoices.length,
+    notes,
+    invoices: JSON.parse(JSON.stringify(invoices)),
+    expenses: JSON.parse(JSON.stringify(expenses))
+  };
+}
+
+function closeCurrentShift(notes = '') {
+  const record = buildShiftClosingRecord(notes);
+  state.data.shiftClosings = Array.isArray(state.data.shiftClosings) ? state.data.shiftClosings : [];
+  state.data.shiftClosings.unshift(record);
+  state.data.shift = {
+    ...(state.data.shift || {}),
+    isOpen: true,
+    startedAt: record.closedAt,
+    openingBalance: record.netDrawer
+  };
+  state.saveData();
+  generateShiftZReport(notes, record);
+  renderShiftHistoryTable();
+  renderReportsView();
+}
+
+function renderShiftHistoryTable() {
+  const tbody = document.getElementById('shift-history-table-body');
+  if (!tbody) return;
+  const records = state.data.shiftClosings || [];
+  if (!records.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:18px; color:var(--text-muted);">لسه مفيش ورديات اتقفلت</td></tr>';
+    return;
+  }
+  tbody.innerHTML = records.map(record => `
+    <tr>
+      <td>${new Date(record.openedAt).toLocaleString('ar-EG')}</td>
+      <td>${new Date(record.closedAt).toLocaleString('ar-EG')}</td>
+      <td>${record.activeInvoiceCount || 0} نشطة / ${record.voidedInvoiceCount || 0} ملغاة</td>
+      <td>${formatCurrency(record.revenue || 0)}</td>
+      <td>${formatCurrency(record.vodafoneCash || 0)}</td>
+      <td>${formatCurrency(record.expenseTotal || 0)}</td>
+      <td>${formatCurrency(record.netDrawer || 0)}</td>
+    </tr>`).join('');
+}
+
+function exportShiftHistoryToCSV() {
+  const records = state.data.shiftClosings || [];
+  const invoices = state.data.invoices || [];
   const expenses = state.data.expenses || [];
+  if (!records.length && !invoices.length && !expenses.length) {
+    showToast('لا توجد حركات لتصديرها حتى الآن', 'warning');
+    return;
+  }
+  const cell = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
+  const rows = [[
+    'نوع الحركة', 'رقم الوردية', 'فتح الوردية', 'إغلاق الوردية', 'تاريخ الحركة', 'رقم الفاتورة',
+    'العميل', 'الهاتف', 'الحلاق', 'البند', 'سعر الوحدة', 'الكمية', 'قيمة البند',
+    'المجموع الفرعي', 'الخصم', 'الإكرامية', 'الإجمالي', 'طريقة الدفع', 'بند المصروف', 'قيمة المصروف',
+    'رصيد الافتتاح', 'مبيعات الوردية', 'فودافون كاش', 'إجمالي المصروفات', 'صافي الدرج', 'ملاحظات'
+  ]];
+  records.forEach(record => rows.push([
+    'ملخص وردية', record.id, record.openedAt, record.closedAt, record.closedAt, '', '', '', record.cashier,
+    '', '', '', '', '', '', '', '', '', '', '', record.openingBalance, record.revenue,
+    record.vodafoneCash, record.expenseTotal, record.netDrawer, record.notes
+  ]));
+
+  const shiftForDate = value => {
+    const time = new Date(value || 0).getTime();
+    const record = records.find(r => time >= new Date(r.openedAt).getTime() && time <= new Date(r.closedAt).getTime());
+    if (record) return record;
+    const currentStart = new Date(state.data.shift?.startedAt || Date.now()).getTime();
+    return time >= currentStart ? { id: 'الوردية الحالية', openedAt: state.data.shift.startedAt, closedAt: '' } : { id: 'قبل تسجيل الورديات', openedAt: '', closedAt: '' };
+  };
+  invoices.forEach(inv => {
+    const shift = shiftForDate(inv.timestamp);
+    const items = Array.isArray(inv.items) && inv.items.length ? inv.items : [{ name: '', price: '', qty: '', itemType: '' }];
+    items.forEach(item => rows.push([
+      inv.isVoided ? 'فاتورة ملغاة' : 'فاتورة', shift.id, shift.openedAt, shift.closedAt, inv.timestamp,
+      inv.invoiceNumber, inv.clientName, inv.clientPhone, inv.barberName, item.name, item.price,
+      item.qty, Number(item.price || 0) * Number(item.qty || 1), inv.subtotal, inv.discount, inv.tip,
+      inv.total, inv.paymentMethod === 'vodafone_cash' ? 'فودافون كاش' : inv.paymentMethod,
+      '', '', '', '', '', '', '', ''
+    ]));
+  });
+  expenses.forEach(exp => {
+    const date = exp.timestamp || exp.createdAt;
+    const shift = shiftForDate(date);
+    rows.push(['مصروف', shift.id, shift.openedAt, shift.closedAt, date, '', '', '', '', '', '', '', '', '', '', '', '', '', exp.desc || exp.description, exp.amount, '', '', '', '', '', '']);
+  });
+  const csv = rows.map(row => row.map(cell).join(',')).join('\r\n');
+  downloadCSV(csv, `سجل_الورديات_والحركات_يوسف_فريست_${new Date().toISOString().split('T')[0]}.csv`);
+  showToast('تم تصدير سجل الورديات والفواتير والمصروفات إلى Excel', 'success');
+}
+
+function renderReportsView() {
+  renderShiftHistoryTable();
+  const allInvoices = state.data.invoices || [];
+  const { inWindow } = getCurrentShiftWindow();
+  const activeInvoices = allInvoices.filter(inv => !inv.isVoided && inWindow(inv.timestamp));
+  const expenses = (state.data.expenses || []).filter(exp => inWindow(exp.timestamp || exp.createdAt));
 
   const totalRevenue = activeInvoices.reduce((sum, inv) => sum + inv.total, 0);
   
@@ -1529,7 +1701,7 @@ function renderReportsView() {
   }, 0);
 
   const totalDigital = activeInvoices.reduce((sum, inv) => {
-    if (inv.paymentMethod === 'card' || inv.paymentMethod === 'wallet') return sum + inv.total;
+    if (inv.paymentMethod === 'card' || inv.paymentMethod === 'wallet' || inv.paymentMethod === 'vodafone_cash') return sum + inv.total;
     if (inv.paymentMethod === 'split' && inv.paymentSplit) return sum + (Number(inv.paymentSplit.card) || 0) + (Number(inv.paymentSplit.wallet) || 0);
     return sum;
   }, 0);
@@ -1547,6 +1719,8 @@ function renderReportsView() {
   document.getElementById('shift-modal-cash').textContent = formatCurrency(netCashInDrawer);
   document.getElementById('shift-modal-digital').textContent = formatCurrency(totalDigital);
   document.getElementById('shift-modal-expenses').textContent = formatCurrency(totalExp);
+  const shiftUser = document.getElementById('shift-modal-user');
+  if (shiftUser) shiftUser.innerHTML = `<i class="fa-solid fa-user-check" style="color:var(--gold);"></i> ${state.data.shift.cashier || 'الكاشير'}`;
 
   // Barber Production & Salon Revenue Table (100% to salon)
   const barberTbody = document.getElementById('barber-commissions-table-body');
@@ -1573,7 +1747,7 @@ function renderReportsView() {
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><strong>${barber.name}</strong> ${isMaster ? '<span style="color:#d97706; font-size:0.78rem; font-weight:700;">⭐ سينيور باربر</span>' : ''}</td>
+        <td><strong>${barber.name}</strong> ${isMaster ? '<span style="color:#d97706; font-size:0.78rem; font-weight:700;"> سينيور باربر</span>' : ''}</td>
         <td><span class="badge" style="background:var(--bg-card); color:var(--text-main); border:1px solid var(--border-subtle); font-size:0.75rem;">كرسي ${barber.chairId || 1}</span></td>
         <td><strong>${bClients}</strong> زبائن</td>
         <td>${formatCurrency(bServicesTotal)}</td>
@@ -1589,7 +1763,7 @@ function renderReportsView() {
   if (invTbody) {
     invTbody.innerHTML = '';
     if (allInvoices.length === 0) {
-      invTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-dim);">لا توجد فواتير مسجلة اليوم حتى الآن</td></tr>`;
+      invTbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-dim);">لا توجد فواتير مسجلة اليوم حتى الآن</td></tr>`;
       return;
     }
     allInvoices.slice().reverse().forEach(inv => {
@@ -1598,10 +1772,13 @@ function renderReportsView() {
       if (inv.paymentMethod === 'cash') payLabel = 'نقدي (كاش)';
       else if (inv.paymentMethod === 'card') payLabel = 'بطاقة / فيزا';
       else if (inv.paymentMethod === 'wallet') payLabel = 'محفظة / إنستاباي';
+      else if (inv.paymentMethod === 'vodafone_cash') payLabel = 'فودافون كاش';
       else if (inv.paymentMethod === 'split') payLabel = 'دفع متعدد (Split)';
       else payLabel = 'أخرى';
 
-      const timeStr = new Date(inv.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
+      const invoiceDate = new Date(inv.timestamp || 0);
+      const dateStr = Number.isNaN(invoiceDate.getTime()) ? '—' : invoiceDate.toLocaleDateString('ar-EG');
+      const timeStr = Number.isNaN(invoiceDate.getTime()) ? '—' : invoiceDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
 
       const tr = document.createElement('tr');
       if (inv.isVoided) {
@@ -1611,13 +1788,16 @@ function renderReportsView() {
 
       tr.innerHTML = `
         <td><strong>#${inv.invoiceNumber}</strong> ${inv.isVoided ? '<span style="color:var(--danger); font-size:0.72rem; font-weight:800; display:block;">[ملغاة]</span>' : ''}</td>
+        <td>${dateStr}</td>
         <td>${timeStr}</td>
         <td>
           <div style="font-weight:700;">${inv.clientName || 'عميل عام'}</div>
           ${inv.clientPhone ? `<div style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-latin);">${inv.clientPhone}</div>` : ''}
+        </td>
         <td>
           <div style="font-weight:800; color:var(--text-main);">${barber.name}</div>
         </td>
+        <td>${payLabel}</td>
         <td><strong style="color:${inv.isVoided ? 'var(--text-muted)' : 'var(--gold-light)'}; font-family:var(--font-latin); text-decoration:${inv.isVoided ? 'line-through' : 'none'};">${formatCurrency(inv.total)}</strong></td>
         <td>
           <div style="display:flex; gap:6px; align-items:center;">
@@ -1658,7 +1838,6 @@ function renderApp() {
   renderReportsView();
   renderCustomersList();
   renderAnalyticsCharts();
-  checkLowStockAlerts();
 }
 
 // ==========================================
@@ -1669,6 +1848,10 @@ function renderCustomersList() {
   if (!container) return;
 
   const searchVal = (document.getElementById('crm-search')?.value || '').toLowerCase().trim();
+  const loyaltyVisitsInput = document.getElementById('crm-loyalty-visits');
+  const loyaltyPercentInput = document.getElementById('crm-loyalty-percent');
+  if (loyaltyVisitsInput) loyaltyVisitsInput.value = state.data.settings.loyaltyVisitThreshold || 5;
+  if (loyaltyPercentInput) loyaltyPercentInput.value = state.data.settings.loyaltyDiscountPercent || 10;
   let customers = [...(state.data.customers || [])];
 
   if (searchVal) {
@@ -1687,11 +1870,11 @@ function renderCustomersList() {
 
   // Update stats
   const statEl = document.getElementById('crm-total-stat');
-  if (statEl) statEl.textContent = totalCustomers;
+  if (statEl) statEl.textContent = formatNumber(totalCustomers);
   const vipEl = document.getElementById('crm-vip-stat');
-  if (vipEl) vipEl.textContent = vipCustomers;
+  if (vipEl) vipEl.textContent = formatNumber(vipCustomers);
   const ptEl = document.getElementById('crm-points-stat');
-  if (ptEl) ptEl.textContent = totalLoyalty.toLocaleString();
+  if (ptEl) ptEl.textContent = formatNumber(totalLoyalty);
 
   container.innerHTML = '';
 
@@ -1713,8 +1896,15 @@ function renderCustomersList() {
       ? Math.floor((Date.now() - new Date(cust.lastVisit).getTime()) / (1000 * 60 * 60 * 24))
       : 9999;
     const isVip = cust.totalVisits >= 10;
+    const loyaltyThreshold = Math.max(1, Number(state.data.settings.loyaltyVisitThreshold) || 5);
+    const rewardReady = Boolean(getLoyaltyReward(cust));
+    const visitsSinceReward = Math.max(0, (Number(cust.totalVisits) || 0) - (Number(cust.lastLoyaltyRewardVisits) || 0));
+    const visitsRemaining = Math.max(0, loyaltyThreshold - visitsSinceReward);
+    const loyaltyMessage = rewardReady
+      ? ` خصم ${state.data.settings.loyaltyDiscountPercent || 10}% جاهز على الفاتورة القادمة`
+      : `باقي ${visitsRemaining} زيارة للخصم`;
     const tierColor = isVip ? 'var(--gold)' : (cust.totalVisits >= 5 ? 'var(--info)' : 'var(--text-muted)');
-    const tierLabel = isVip ? '👑 VIP' : (cust.totalVisits >= 5 ? '⭐ منتظم' : '🆕 جديد');
+    const tierLabel = isVip ? ' VIP' : (cust.totalVisits >= 5 ? ' منتظم' : ' جديد');
     const statusColor = daysSince <= 14 ? 'var(--success)' : (daysSince <= 30 ? 'var(--warning)' : 'var(--danger)');
 
     const card = document.createElement('div');
@@ -1748,14 +1938,16 @@ function renderCustomersList() {
           <span class="cstat-lbl">إجمالي الإنفاق</span>
         </div>
         <div class="customer-stat" style="border-color:var(--gold);">
-          <span class="cstat-val" style="color:var(--gold);">🏆 ${cust.loyaltyPoints || 0}</span>
+          <span class="cstat-val" style="color:var(--gold);"> ${cust.loyaltyPoints || 0}</span>
           <span class="cstat-lbl">نقطة ولاء</span>
         </div>
       </div>
 
+      <div class="customer-loyalty-progress ${rewardReady ? 'is-ready' : ''}">${loyaltyMessage}</div>
+
       <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px; font-size:0.78rem; color:var(--text-muted);">
         <span><i class="fa-regular fa-calendar"></i> آخر زيارة: ${lastVisitDate}</span>
-        <span style="color:${statusColor}; font-weight:800;">${daysSince === 9999 ? '' : (daysSince === 0 ? '🟢 اليوم' : (daysSince <= 7 ? `🟢 منذ ${daysSince} أيام` : (daysSince <= 30 ? `🟡 منذ ${daysSince} يوم` : `🔴 منذ ${daysSince} يوم`)))}</span>
+        <span style="color:${statusColor}; font-weight:800;">${daysSince === 9999 ? '' : (daysSince === 0 ? ' اليوم' : (daysSince <= 7 ? ` منذ ${daysSince} أيام` : (daysSince <= 30 ? ` منذ ${daysSince} يوم` : ` منذ ${daysSince} يوم`)))}</span>
       </div>
     `;
     container.appendChild(card);
@@ -1848,17 +2040,18 @@ function addCustomerToQueue(customerId) {
 }
 
 // Update customer record on checkout
-function updateCustomerOnCheckout(clientName, clientPhone, amount) {
+function updateCustomerOnCheckout(clientName, clientPhone, amount, redeemedRewardVisits = 0) {
   if (!state.data.customers) state.data.customers = [];
-  let cust = state.data.customers.find(c =>
-    c.phone && clientPhone && c.phone === clientPhone
-  );
+  let cust = findCustomerByPhone(clientPhone);
   if (!cust && clientName && clientName !== 'عميل عام') {
     cust = state.data.customers.find(c =>
       c.name.trim() === clientName.trim()
     );
   }
   if (cust) {
+    if (redeemedRewardVisits && Number(cust.totalVisits) === Number(redeemedRewardVisits)) {
+      cust.lastLoyaltyRewardVisits = Number(redeemedRewardVisits);
+    }
     cust.totalVisits = (cust.totalVisits || 0) + 1;
     cust.totalSpent = (cust.totalSpent || 0) + amount;
     cust.loyaltyPoints = Math.floor((cust.totalSpent) / 10); // 1 point per 10 EGP
@@ -1916,7 +2109,7 @@ function renderAnalyticsCharts() {
   // Payment method donut
   const totalCash = invoices.filter(i => i.paymentMethod === 'cash').reduce((s, i) => s + i.total, 0);
   const totalCard = invoices.filter(i => i.paymentMethod === 'card').reduce((s, i) => s + i.total, 0);
-  const totalWallet = invoices.filter(i => i.paymentMethod === 'wallet').reduce((s, i) => s + i.total, 0);
+  const totalWallet = invoices.filter(i => i.paymentMethod === 'wallet' || i.paymentMethod === 'vodafone_cash').reduce((s, i) => s + i.total, 0);
   const grandTotal = totalCash + totalCard + totalWallet || 1;
 
   const payChartEl = document.getElementById('analytics-payment-chart');
@@ -1959,7 +2152,7 @@ function renderAnalyticsCharts() {
           <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 12px; background:var(--bg-input); border-radius:8px; border:1px solid ${isLow ? 'rgba(220,38,38,0.3)' : 'var(--border-subtle)'};">
             <span style="font-weight:700; font-size:0.9rem;">${p.name}</span>
             <span style="padding:3px 10px; border-radius:12px; font-size:0.8rem; font-weight:800; background:${isLow ? 'var(--danger-bg)' : 'var(--success-bg)'}; color:${isLow ? 'var(--danger)' : 'var(--success)'};">
-              ${p.stock} قطعة ${isLow ? '⚠️ منخفض' : '✓ متوفر'}
+              ${p.stock} قطعة ${isLow ? ' منخفض' : '✓ متوفر'}
             </span>
           </div>
         `;
@@ -1983,7 +2176,7 @@ function checkLowStockAlerts() {
 
   alertBar.style.display = 'flex';
   document.getElementById('low-stock-alert-text').textContent =
-    `⚠️ تنبيه مخزون: ${lowItems.map(p => `${p.name} (متبقي: ${p.stock})`).join(' | ')}`;
+    ` تنبيه مخزون: ${lowItems.map(p => `${p.name} (متبقي: ${p.stock})`).join(' | ')}`;
 }
 
 
@@ -2043,7 +2236,7 @@ function openAssignChairModal(queueItemId) {
     const opt = document.createElement('option');
     opt.value = chair.id;
     opt.textContent = isMaster
-      ? `⭐ كرسي 6 - الكابتن ${barber.name} (سينيور باربر)`
+      ? ` كرسي 6 - الكابتن ${barber.name} (سينيور باربر)`
       : `كرسي ${chair.id} - الكابتن ${barber.name}`;
     select.appendChild(opt);
   });
@@ -2200,28 +2393,13 @@ function completeCheckout() {
   const barber = state.data.barbers.find(b => b.id === barberId);
 
   const discount = Math.max(0, parseFloat(document.getElementById('cart-discount-input')?.value || 0));
+  const discountInput = document.getElementById('cart-discount-input');
+  const loyaltyRewardVisits = Number(discountInput?.dataset.loyaltyRewardVisits) || 0;
+  const loyaltyRewardAmount = Number(discountInput?.dataset.loyaltyRewardAmount) || 0;
+  const redeemedLoyaltyRewardVisits = loyaltyRewardAmount > 0 && discount >= loyaltyRewardAmount ? loyaltyRewardVisits : 0;
   const tip = Math.max(0, parseFloat(document.getElementById('cart-tip-input')?.value || 0));
   const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const grandTotal = Math.max(0, subtotal - discount) + tip;
-
-  let paymentSplit = null;
-  if (state.cartPaymentMethod === 'split') {
-    const cashVal = parseFloat(document.getElementById('split-cash-val')?.value || 0);
-    const cardVal = parseFloat(document.getElementById('split-card-val')?.value || 0);
-    const walletVal = parseFloat(document.getElementById('split-wallet-val')?.value || 0);
-    const totalSplit = cashVal + cardVal + walletVal;
-
-    if (Math.abs(totalSplit - grandTotal) > 0.5) {
-      showToast(`مجموع مبالغ الدفع (${totalSplit} ج.م) غير مطابق لمطلوب الفاتورة (${grandTotal} ج.م)!`, 'danger');
-      return;
-    }
-
-    paymentSplit = {
-      cash: cashVal,
-      card: cardVal,
-      wallet: walletVal
-    };
-  }
 
   const invoiceNumber = 1000 + (state.data.invoices.length + 1);
   const invoice = {
@@ -2236,10 +2414,10 @@ function completeCheckout() {
     items: JSON.parse(JSON.stringify(state.cart)),
     subtotal: subtotal,
     discount: discount,
+    loyaltyRewardVisits: redeemedLoyaltyRewardVisits,
     tip: tip,
     total: grandTotal,
-    paymentMethod: state.cartPaymentMethod,
-    paymentSplit: paymentSplit,
+    paymentMethod: 'vodafone_cash',
     isVoided: false
   };
 
@@ -2297,7 +2475,7 @@ function completeCheckout() {
   }
 
   // Update Customer CRM & Loyalty
-  updateCustomerOnCheckout(clientName, clientPhone, grandTotal);
+  updateCustomerOnCheckout(clientName, clientPhone, grandTotal, redeemedLoyaltyRewardVisits);
 
   // Clear Cart & reset inputs
   state.cart = [];
@@ -2307,9 +2485,6 @@ function completeCheckout() {
   document.getElementById('cart-discount-input').value = '0';
   const tipInp = document.getElementById('cart-tip-input');
   if (tipInp) tipInp.value = '0';
-  document.getElementById('split-cash-val').value = '0';
-  document.getElementById('split-card-val').value = '0';
-  document.getElementById('split-wallet-val').value = '0';
 
   state.saveData();
   renderApp();
@@ -2330,9 +2505,10 @@ function renderThermalReceipt(invoice) {
     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
-  let payText = 'نقدي (كاش)';
+  let payText = 'فودافون كاش';
   if (invoice.paymentMethod === 'card') payText = 'بطاقة / فيزا';
   else if (invoice.paymentMethod === 'wallet') payText = 'محفظة / إنستاباي';
+  else if (invoice.paymentMethod === 'vodafone_cash') payText = 'فودافون كاش';
   else if (invoice.paymentMethod === 'split') payText = 'دفع متعدد (Split)';
 
   const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'http://localhost:8080';
@@ -2368,22 +2544,12 @@ function renderThermalReceipt(invoice) {
       العميل: ${invoice.clientName}
     </div>
 
-    ${invoice.paymentMethod === 'split' && invoice.paymentSplit ? `
-      <div style="font-size:10.5px; background:#f8fafc; border:1px dashed #cbd5e1; padding:4px 6px; border-radius:4px; margin-bottom:6px;">
-        <span>تفصيل الدفع: </span>
-        ${invoice.paymentSplit.cash > 0 ? `<span>كاش: ${formatCurrency(invoice.paymentSplit.cash)} </span>` : ''}
-        ${invoice.paymentSplit.card > 0 ? `<span>| فيزا: ${formatCurrency(invoice.paymentSplit.card)} </span>` : ''}
-        ${invoice.paymentSplit.wallet > 0 ? `<span>| محفظة: ${formatCurrency(invoice.paymentSplit.wallet)}</span>` : ''}
-      </div>
-    ` : ''}
-
     <div class="receipt-divider"></div>
 
     <table class="receipt-table">
       <thead>
         <tr>
           <th>الصنف</th>
-          <th style="text-align:center;">الكمية</th>
           <th style="text-align:left;">المبلغ</th>
         </tr>
       </thead>
@@ -2391,7 +2557,6 @@ function renderThermalReceipt(invoice) {
         ${invoice.items.map(item => `
           <tr>
             <td>${item.name}</td>
-            <td style="text-align:center;">${item.qty}</td>
             <td style="text-align:left;">${formatCurrency(item.price * item.qty)}</td>
           </tr>
         `).join('')}
@@ -2539,7 +2704,7 @@ function openTransferChairModal(sourceChairId) {
     const opt = document.createElement('option');
     opt.value = c.id;
     opt.textContent = isMaster
-      ? `⭐ كرسي رقم 6 - الكابتن ${barber.name} (سينيور باربر)`
+      ? ` كرسي رقم 6 - الكابتن ${barber.name} (سينيور باربر)`
       : `كرسي رقم ${c.id} - الكابتن ${barber.name}`;
     select.appendChild(opt);
   });
@@ -2612,10 +2777,19 @@ function promptVoidInvoice(invoiceId) {
 }
 
 // Thermal Shift Z-Report
-function generateShiftZReport(notes = '') {
-  const invoices = (state.data.invoices || []).filter(i => !i.isVoided);
-  const voidedInvoices = (state.data.invoices || []).filter(i => i.isVoided);
-  const expenses = state.data.expenses || [];
+function generateShiftZReport(notes = '', shiftRecord = null) {
+  const openedAt = shiftRecord?.openedAt || state.data.shift?.startedAt || new Date().toISOString();
+  const closedAt = shiftRecord?.closedAt || new Date().toISOString();
+  const startMs = new Date(openedAt).getTime();
+  const endMs = new Date(closedAt).getTime();
+  const inShift = value => {
+    const time = new Date(value || 0).getTime();
+    return Number.isFinite(time) && time >= startMs && time <= endMs;
+  };
+  const shiftInvoices = shiftRecord?.invoices || (state.data.invoices || []).filter(i => inShift(i.timestamp));
+  const invoices = shiftInvoices.filter(i => !i.isVoided);
+  const voidedInvoices = shiftInvoices.filter(i => i.isVoided);
+  const expenses = shiftRecord?.expenses || (state.data.expenses || []).filter(e => inShift(e.timestamp || e.createdAt));
 
   const totalRev = invoices.reduce((sum, i) => sum + i.total, 0);
   const totalCash = invoices.reduce((sum, inv) => {
@@ -2624,16 +2798,16 @@ function generateShiftZReport(notes = '') {
     return sum;
   }, 0);
   const totalDigital = invoices.reduce((sum, inv) => {
-    if (inv.paymentMethod === 'card' || inv.paymentMethod === 'wallet') return sum + inv.total;
+    if (inv.paymentMethod === 'card' || inv.paymentMethod === 'wallet' || inv.paymentMethod === 'vodafone_cash') return sum + inv.total;
     if (inv.paymentMethod === 'split' && inv.paymentSplit) return sum + (Number(inv.paymentSplit.card) || 0) + (Number(inv.paymentSplit.wallet) || 0);
     return sum;
   }, 0);
 
   const totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const openBal = state.data.shift.openingBalance || 0;
-  const netDrawer = Math.max(0, openBal + totalCash - totalExp);
+  const openBal = Number(shiftRecord?.openingBalance ?? state.data.shift.openingBalance) || 0;
+  const netDrawer = Number(shiftRecord?.netDrawer ?? Math.max(0, openBal + totalCash - totalExp));
 
-  const dateNow = new Date().toLocaleDateString('ar-EG', {
+  const dateNow = new Date(closedAt).toLocaleString('ar-EG', {
     weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
@@ -2646,7 +2820,7 @@ function generateShiftZReport(notes = '') {
       <h2>${state.data.settings.shopName}</h2>
       <p style="font-weight:900; font-size:13px; margin-top:2px; letter-spacing:1px; color:#b45309;">*** تقرير تقفيل الوردية Z-REPORT ***</p>
       <p style="font-size:11px;">تاريخ التقفيل: ${dateNow}</p>
-      <p style="font-size:11.5px; font-weight:700;">المسؤول / الكاشير: حسام حارس</p>
+      <p style="font-size:11.5px; font-weight:700;">المسؤول / الكاشير: ${shiftRecord?.cashier || state.data.shift.cashier || 'الكاشير'}</p>
     </div>
 
     <div class="receipt-divider"></div>
@@ -2665,7 +2839,7 @@ function generateShiftZReport(notes = '') {
       <span>${formatCurrency(totalCash)}</span>
     </div>
     <div class="receipt-totals-row" style="font-size:11px; color:#555;">
-      <span>• المدفوعات الإلكترونية:</span>
+      <span>• فودافون كاش:</span>
       <span>${formatCurrency(totalDigital)}</span>
     </div>
     <div class="receipt-totals-row" style="color:#b91c1c;">
@@ -2729,8 +2903,8 @@ function generateShiftZReport(notes = '') {
     ` : ''}
 
     <div style="margin-top:25px; display:flex; justify-content:space-between; font-size:11px; border-top:1px dashed #777; padding-top:10px;">
-      <div>توقيع الكاشير (حسام حارس): ...............</div>
-      <div>توقيع الإدارة (مستر / سيد فرست): ...............</div>
+      <div>توقيع الكاشير (${shiftRecord?.cashier || state.data.shift.cashier || 'الكاشير'}): ...............</div>
+      <div>توقيع الإدارة (يوسف فريست): ...............</div>
     </div>
   `;
 
@@ -2802,7 +2976,7 @@ function showRoleSwitchBanner(role) {
       <div class="role-splash-content">
         <div class="role-splash-icon"><i class="fa-solid fa-crown"></i></div>
         <div class="role-splash-text">
-          <h3>👑 وضع الإدارة العامة (Admin Mode)</h3>
+          <h3> وضع الإدارة العامة (Admin Mode)</h3>
           <p>أهلًا بك. جميع صلاحيات الإدارة والتقارير متاحة.</p>
         </div>
       </div>
@@ -2813,7 +2987,7 @@ function showRoleSwitchBanner(role) {
       <div class="role-splash-content">
         <div class="role-splash-icon"><i class="fa-solid fa-cash-register"></i></div>
         <div class="role-splash-text">
-          <h3>🏷️ وضع الكاشير ونقطة البيع (Cashier Mode)</h3>
+          <h3> وضع الكاشير ونقطة البيع (Cashier Mode)</h3>
           <p>واجهة الكاشير جاهزة لاستقبال العملاء وإتمام عمليات البيع.</p>
         </div>
       </div>
@@ -2849,7 +3023,7 @@ function updateRoleUI(triggerEffects = false) {
   }
   if (icon) icon.className = isAdmin ? 'fa-solid fa-crown' : 'fa-solid fa-cash-register';
   if (name) name.textContent = isAdmin ? 'المدير (Admin)' : 'الكاشير (Cashier)';
-  if (sub) sub.textContent = isAdmin ? 'كامل الصلاحيات 👑' : 'نقطة البيع والاستقبال';
+  if (sub) sub.textContent = isAdmin ? 'كامل الصلاحيات ' : 'نقطة البيع والاستقبال';
 
   // 3. Top Mode Strip Banner
   const strip = document.getElementById('role-mode-strip');
@@ -2868,7 +3042,7 @@ function updateRoleUI(triggerEffects = false) {
         : 'الكاشير — المبيعات واستقبال العملاء.';
     }
     if (stripBtnText) {
-      stripBtnText.textContent = isAdmin ? 'التحويل لوضع الكاشير 🏷️' : 'تسجيل دخول كمدير 👑';
+      stripBtnText.textContent = isAdmin ? 'التحويل لوضع الكاشير ' : 'تسجيل دخول كمدير ';
     }
   }
 
@@ -2933,7 +3107,7 @@ function toggleRole() {
       updateRoleUI(true);
       renderTopMetrics();
       renderBarbersList();
-      showToast('أهلاً بك يا مستر سيد فرست! تم فتح وضع الإدارة وعرض إجمالي الخزينة 👑', 'success');
+      showToast('أهلاً بك يا مستر يوسف فريست! تم فتح وضع الإدارة وعرض إجمالي الخزينة ', 'success');
     }, 'تسجيل الدخول كمدير عام');
   }
 }
@@ -3079,7 +3253,7 @@ function populateQueueBarbersDropdown() {
     const opt = document.createElement('option');
     opt.value = b.id;
     opt.textContent = isMaster
-      ? `⭐ الكابتن ${b.name} (سينيور باربر - كرسي ${b.chairId || 6})`
+      ? ` الكابتن ${b.name} (سينيور باربر - كرسي ${b.chairId || 6})`
       : `الكابتن ${b.name} (كرسي ${b.chairId})`;
     select.appendChild(opt);
   });
@@ -3113,31 +3287,32 @@ function sendInvoiceWhatsApp(invoiceId) {
   if (cleanPhone.startsWith('0')) cleanPhone = '2' + cleanPhone;
 
   const barber = state.data.barbers.find(b => b.id == inv.barberId) || { name: 'فريق العمل' };
-  const itemsText = (inv.items || []).map(it => `• ${it.name} (x${it.qty}): ${it.price * it.qty} ${state.data.settings.currency}`).join('\n');
+  const itemsText = (inv.items || []).map(it => `• ${it.name}: ${it.price * it.qty} ${state.data.settings.currency}`).join('\n');
 
   let payLabel = 'كاش نقدي';
   if (inv.paymentMethod === 'card') payLabel = 'بطاقة / فيزا';
   else if (inv.paymentMethod === 'wallet') payLabel = 'محفظة إلكترونية / إنستاباي';
+  else if (inv.paymentMethod === 'vodafone_cash') payLabel = 'فودافون كاش';
   else if (inv.paymentMethod === 'split') payLabel = 'دفع متعدد مقسم';
 
-  const rawMsg = `💈 *${state.data.settings.shopName}*\n`
-    + `🧾 *إيصال إلكتروني - فاتورة رقم #${inv.invoiceNumber}*\n`
+  const rawMsg = ` *${state.data.settings.shopName}*\n`
+    + ` *إيصال إلكتروني - فاتورة رقم #${inv.invoiceNumber}*\n`
     + `━━━━━━━━━━━━━━━━━━\n`
-    + `👤 *العميل:* ${inv.clientName || 'عميل كريم'}\n`
-    + `✂️ *الحلاق:* ${barber.name || 'فريق العمل'}\n`
-    + `🌐 *رابط حجز موعدك القادم:* ${window.location.origin && window.location.origin !== 'null' ? window.location.origin + '/booking.html' : 'http://localhost:8080/booking.html'}\n`
-    + `📅 *التاريخ:* ${new Date(inv.timestamp).toLocaleDateString('ar-EG')} - ${new Date(inv.timestamp).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', hour12:true})}\n`
+    + ` *العميل:* ${inv.clientName || 'عميل كريم'}\n`
+    + ` *الحلاق:* ${barber.name || 'فريق العمل'}\n`
+    + ` *رابط حجز موعدك القادم:* ${window.location.origin && window.location.origin !== 'null' ? window.location.origin + '/booking.html' : 'http://localhost:8080/booking.html'}\n`
+    + ` *التاريخ:* ${new Date(inv.timestamp).toLocaleDateString('ar-EG')} - ${new Date(inv.timestamp).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', hour12:true})}\n`
     + `━━━━━━━━━━━━━━━━━━\n`
-    + `📋 *تفاصيل الخدمات والمشتريات:*\n${itemsText}\n`
+    + ` *تفاصيل الخدمات والمشتريات:*\n${itemsText}\n`
     + `━━━━━━━━━━━━━━━━━━\n`
-    + (inv.discount > 0 ? `🎁 *الخصم:* -${inv.discount} ${state.data.settings.currency}\n` : '')
-    + (inv.tip > 0 ? `🪙 *إكرامية الحلاق (Tip):* +${inv.tip} ${state.data.settings.currency}\n` : '')
-    + `💰 *الإجمالي النهائي: ${inv.total} ${state.data.settings.currency}*\n`
-    + `💳 *طريقة الدفع:* ${payLabel}\n`
+    + (inv.discount > 0 ? ` *الخصم:* -${inv.discount} ${state.data.settings.currency}\n` : '')
+    + (inv.tip > 0 ? ` *إكرامية الحلاق (Tip):* +${inv.tip} ${state.data.settings.currency}\n` : '')
+    + ` *الإجمالي النهائي: ${inv.total} ${state.data.settings.currency}*\n`
+    + ` *طريقة الدفع:* ${payLabel}\n`
     + `━━━━━━━━━━━━━━━━━━\n`
-    + `✨ *${state.data.settings.receiptFooter || 'شكراً لزيارتكم! نتمنى لكم مظهراً أنيقاً دائماً.'}*\n`
-    + `📍 ${state.data.settings.shopAddress || ''}\n`
-    + `📞 هاتف: ${state.data.settings.shopPhone || '01032232541'}`;
+    + ` *${state.data.settings.receiptFooter || 'شكراً لزيارتكم! نتمنى لكم مظهراً أنيقاً دائماً.'}*\n`
+    + ` ${state.data.settings.shopAddress || ''}\n`
+    + ` هاتف: ${state.data.settings.shopPhone || '01032232541'}`;
 
   window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(rawMsg)}`, '_blank');
   showToast('تم فتح واتساب لإرسال الفاتورة للعميل', 'success');
@@ -3168,10 +3343,10 @@ function exportInvoicesToCSV() {
     const timeStr = new Date(inv.timestamp).toLocaleString('ar-EG');
     const itemsNames = (inv.items || []).map(i => `${i.name} (x${i.qty})`).join(' + ');
     const status = inv.isVoided ? 'ملغاة' : 'نشطة/مسددة';
-    let payMethod = inv.paymentMethod === 'cash' ? 'كاش نقدي' : (inv.paymentMethod === 'card' ? 'فيزا/بطاقة' : (inv.paymentMethod === 'wallet' ? 'محفظة/إنستاباي' : 'دفع مقسم'));
+    let payMethod = inv.paymentMethod === 'vodafone_cash' ? 'فودافون كاش' : (inv.paymentMethod === 'cash' ? 'كاش نقدي' : (inv.paymentMethod === 'card' ? 'فيزا/بطاقة' : (inv.paymentMethod === 'wallet' ? 'محفظة/إنستاباي' : 'دفع مقسم')));
     csv += `"${inv.invoiceNumber}","${timeStr}","${inv.clientName || 'عميل عام'}","${inv.clientPhone || ''}","${inv.barberName || ''}","${payMethod}","${inv.subtotal || inv.total}","${inv.discount || 0}","${inv.tip || 0}","${inv.total}","${status}","${itemsNames.replace(/"/g, '""')}"\n`;
   });
-  downloadCSV(csv, `سجل_فواتير_صالون_سيد_فرست_${new Date().toISOString().split('T')[0]}.csv`);
+  downloadCSV(csv, `سجل_فواتير_صالون_يوسف_فريست_${new Date().toISOString().split('T')[0]}.csv`);
   showToast('تم تصدير ملف إكسيل الفواتير بنجاح!', 'success');
 }
 
@@ -3311,31 +3486,6 @@ function initializeApp() {
     renderPosCatalog();
   });
 
-  // POS Barcode Scanner input
-  document.getElementById('pos-barcode-input')?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const code = e.target.value.trim().toLowerCase();
-      if (!code) return;
-      const product = (state.data.products || []).find(p =>
-        p.id.toString() === code ||
-        p.name.toLowerCase().includes(code)
-      );
-      if (product) {
-        addItemToCart({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          itemType: 'product'
-        });
-        showToast(`تم مسح وإضافة المنتج: ${product.name}`, 'success');
-      } else {
-        showToast('لم يتم العثور على منتج بهذا الباركود!', 'warning');
-      }
-      e.target.value = '';
-    }
-  });
-
   // POS Active Client Picker change
   document.getElementById('pos-active-client-pick')?.addEventListener('change', (e) => {
     if (!e.target.value) return;
@@ -3368,18 +3518,16 @@ function initializeApp() {
     }
   });
 
-  // POS Payment Method Selector
-  document.querySelectorAll('.pay-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.cartPaymentMethod = btn.dataset.method;
-    });
-  });
-
   // POS Discount & Tip input change
   document.getElementById('cart-discount-input')?.addEventListener('input', () => {
     renderPosCart();
+  });
+  document.getElementById('pos-client-phone')?.addEventListener('change', () => {
+    renderPosCart();
+    const customer = findCustomerByPhone(document.getElementById('pos-client-phone').value);
+    if (state.cart.length && getLoyaltyReward(customer)) {
+      showToast(`تم تطبيق خصم الولاء ${state.data.settings.loyaltyDiscountPercent || 10}% على الفاتورة`, 'success');
+    }
   });
   document.getElementById('cart-tip-input')?.addEventListener('input', () => {
     renderPosCart();
@@ -3422,6 +3570,9 @@ function initializeApp() {
   });
   document.getElementById('btn-export-commissions-csv')?.addEventListener('click', () => {
     exportCommissionsToCSV();
+  });
+  document.getElementById('btn-export-shift-history')?.addEventListener('click', () => {
+    exportShiftHistoryToCSV();
   });
 
   // Sound Toggle
@@ -3705,7 +3856,7 @@ function initializeApp() {
         category,
         price,
         duration,
-        icon: '💈'
+        icon: 'fa-shop'
       });
     } else {
       const stock = parseInt(document.getElementById('item-input-stock').value) || 10;
@@ -3716,7 +3867,7 @@ function initializeApp() {
         price,
         cost: price * 0.6,
         stock,
-        icon: '🧴'
+        icon: 'fa-bottle-water'
       });
     }
 
@@ -3753,8 +3904,8 @@ function initializeApp() {
   document.getElementById('btn-confirm-close-shift')?.addEventListener('click', () => {
     const notes = document.getElementById('shift-modal-notes').value.trim();
     closeModal('modal-close-shift');
-    generateShiftZReport(notes);
-    showToast('تم تقفيل الوردية وجاري طباعة تقرير Z-Report...', 'success');
+    closeCurrentShift(notes);
+    showToast('تم حفظ قفلة الوردية وفتح وردية جديدة، التقرير جاهز للطباعة', 'success');
   });
 
   // Print Z-Report
@@ -3819,6 +3970,18 @@ function initializeApp() {
     showToast('تم حفظ إعدادات الصالون وقاعدة البيانات السحابية بنجاح', 'success');
   });
 
+  document.getElementById('btn-save-loyalty-settings')?.addEventListener('click', () => {
+    requireAdminAuth(() => {
+      const visits = Math.max(1, Math.min(100, parseInt(document.getElementById('crm-loyalty-visits').value) || 5));
+      const percent = Math.max(1, Math.min(100, parseInt(document.getElementById('crm-loyalty-percent').value) || 10));
+      state.data.settings.loyaltyVisitThreshold = visits;
+      state.data.settings.loyaltyDiscountPercent = percent;
+      state.saveData();
+      renderCustomersList();
+      showToast(`تم تحديث الولاء: خصم ${percent}% بعد كل ${visits} زيارات`, 'success');
+    }, 'تعديل نظام الولاء');
+  });
+
   // Manual Trigger: Sync Local Salon Data to Cloud
   document.getElementById('btn-sync-to-cloud')?.addEventListener('click', async () => {
     const btn = document.getElementById('btn-sync-to-cloud');
@@ -3866,13 +4029,6 @@ function initializeApp() {
       } else if (btn.id === 'btn-pin-submit') {
         handlePinKeyPress('submit');
       }
-    });
-  });
-
-  // Split payment inputs calculations
-  ['split-cash-val', 'split-card-val', 'split-wallet-val'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', () => {
-      updateSplitPaymentCalculations();
     });
   });
 
@@ -4064,7 +4220,7 @@ function initializeApp() {
           state.saveData();
           renderAppointments();
           SoundSystem.playChime();
-          showToast(`🔔 حجز جديد أونلاين: ${booking.name} (${booking.time})`, 'success');
+          showToast(` حجز جديد أونلاين: ${booking.name} (${booking.time})`, 'success');
         }
       }
     });
@@ -4145,7 +4301,7 @@ function initializeApp() {
                     clientName: ri.clientName,
                     clientPhone: ri.clientPhone,
                     barberId: ri.barberID,
-                    barberName: ri.barberName || 'مستر / سيد فرست',
+                    barberName: ri.barberName || 'مستر / يوسف فريست',
                     items: (ri.items || []).map(it => ({
                       id: it.itemID,
                       name: it.itemName,
@@ -4241,7 +4397,7 @@ function initializeApp() {
               state.saveData();
               renderAppointments();
               SoundSystem.playChime();
-              showToast(`🔔 تم استلام ${newBookingCount} حجز جديد من قاعدة بيانات SQL Server!`, 'success');
+              showToast(` تم استلام ${newBookingCount} حجز جديد من قاعدة بيانات SQL Server!`, 'success');
             }
           }
         } catch (e) {}

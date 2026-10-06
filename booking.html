@@ -1,855 +1,1000 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حجز موعد أونلاين | صالون سيد فرست - Sayed First</title>
-  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#c59b27">
-  <meta name="salon-api-base" content="">
-  
-  <!-- Icons load without blocking the page; fonts use local system fallbacks. -->
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-
-  <!-- Firebase Compat SDK -->
-  <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script defer src="firebase-config.js?v=2.7"></script>
-
-  <style>
-    :root {
-      --bg: #0b0f19;
-      --bg-card: #131b2b;
-      --bg-card-hover: #182338;
-      --bg-input: #1a2438;
-      --gold: #c59b27;
-      --gold-light: #fbbf24;
-      --gold-gradient: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
-      --gold-glow: rgba(197, 155, 39, 0.25);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #243048;
-      --border-gold: rgba(197, 155, 39, 0.4);
-      --success: #059669;
-      --danger: #dc2626;
-      --radius: 16px;
-      --font-ar: 'Segoe UI', Tahoma, Arial, sans-serif;
-      --font-lat: 'Segoe UI', Arial, sans-serif;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: var(--font-ar);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(217, 119, 6, 0.08) 0%, transparent 45%),
-        radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.05) 0%, transparent 45%);
-    }
-
-    /* Barber Pole Top Line */
-    .barber-pole-top {
-      height: 5px;
-      width: 100%;
-      background: repeating-linear-gradient(
-        -45deg,
-        #dc2626,
-        #dc2626 12px,
-        #ffffff 12px,
-        #ffffff 24px,
-        #2563eb 24px,
-        #2563eb 36px
-      );
-      background-size: 200% 100%;
-      animation: poleMove 6s linear infinite;
-    }
-    @keyframes poleMove { 0% { background-position: 0 0; } 100% { background-position: 100% 0; } }
-
-    /* Header */
-    .booking-header {
-      text-align: center;
-      padding: 30px 20px 20px;
-    }
-
-    .brand-logo {
-      width: 75px;
-      height: 75px;
-      border-radius: 50%;
-      border: 3px solid var(--gold);
-      box-shadow: 0 0 20px var(--gold-glow);
-      margin-bottom: 12px;
-      object-fit: cover;
-    }
-
-    .shop-title {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: #ffffff;
-      margin-bottom: 4px;
-    }
-
-    .shop-tagline {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    /* Main Container */
-    .container {
-      max-width: 650px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0 16px 50px;
-      flex: 1;
-    }
-
-    /* Step Card */
-    .step-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .step-card:hover {
-      border-color: var(--border-gold);
-    }
-
-    .step-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--gold-light);
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .step-num {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--gold);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      font-family: var(--font-lat);
-      font-weight: 900;
-    }
-
-    /* Services Grid */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
-    .service-item-card {
-      background: var(--bg-input);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all 0.25s ease;
-      user-select: none;
-    }
-
-    .service-item-card:hover {
-      border-color: var(--gold);
-      transform: translateY(-2px);
-    }
-
-    .service-item-card.selected {
-      border-color: var(--gold);
-      background: rgba(197, 155, 39, 0.12);
-      box-shadow: 0 0 14px var(--gold-glow);
-    }
-
-    .service-icon {
-      font-size: 1.6rem;
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .service-details {
-      flex: 1;
-    }
-
-    .service-name {
-      font-weight: 800;
-      font-size: 1rem;
-      color: #ffffff;
-      margin: 0;
-    }
-
-    .service-check {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: transparent;
-      font-size: 0.75rem;
-      transition: all 0.2s;
-    }
-
-    .service-item-card.selected .service-check {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #fff;
-    }
-
-    /* Barbers Grid */
-    .barbers-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 12px;
-    }
-
-    .barber-card {
-      background: var(--bg-input);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      user-select: none;
-    }
-
-    .barber-card:hover {
-      border-color: var(--gold);
-      transform: translateY(-2px);
-    }
-
-    .barber-card.selected {
-      border-color: var(--gold);
-      background: rgba(197, 155, 39, 0.14);
-      box-shadow: 0 0 14px var(--gold-glow);
-    }
-
-    .barber-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      margin: 0 auto 8px;
-      object-fit: cover;
-      border: 2px solid var(--border);
-    }
-
-    .barber-card.selected .barber-avatar {
-      border-color: var(--gold);
-    }
-
-    .barber-name {
-      font-weight: 800;
-      font-size: 0.88rem;
-      color: #fff;
-      margin-bottom: 3px;
-    }
-
-    .barber-role {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
-
-    /* Date and Time */
-    .date-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
-
-    .date-pill {
-      flex: 1;
-      min-width: 90px;
-      background: var(--bg-input);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .date-pill.selected {
-      border-color: var(--gold);
-      background: rgba(197, 155, 39, 0.15);
-      color: var(--gold-light);
-    }
-
-    .date-pill .day-name { font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 2px; }
-    .date-pill.selected .day-name { color: var(--gold-light); }
-    .date-pill .day-num { font-size: 1.15rem; font-weight: 900; font-family: var(--font-lat); }
-
-    .slots-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .slot-pill {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 4px;
-      text-align: center;
-      font-size: 0.85rem;
-      font-family: var(--font-lat);
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .slot-pill:hover {
-      border-color: var(--gold);
-    }
-
-    .slot-pill.selected {
-      background: var(--gold-gradient);
-      border-color: var(--gold);
-      color: #fff;
-      box-shadow: 0 0 10px var(--gold-glow);
-    }
-
-    /* Inputs */
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .form-control {
-      width: 100%;
-      background: var(--bg-input);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      color: #fff;
-      font-family: var(--font-ar);
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.25s;
-    }
-
-    .form-control:focus {
-      border-color: var(--gold);
-    }
-
-    /* Summary Card */
-    .summary-card {
-      background: linear-gradient(135deg, rgba(197, 155, 39, 0.15) 0%, rgba(18, 26, 43, 0.95) 100%);
-      border: 1.5px solid var(--gold);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 24px;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-    }
-
-    .summary-total {
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 10px;
-      margin-top: 10px;
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: var(--gold-light);
-    }
-
-    /* Submit Button */
-    .btn-submit-booking {
-      width: 100%;
-      background: var(--gold-gradient);
-      border: none;
-      color: #fff;
-      padding: 16px;
-      font-size: 1.1rem;
-      font-weight: 900;
-      font-family: var(--font-ar);
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(197, 155, 39, 0.4);
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn-submit-booking:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(197, 155, 39, 0.55);
-    }
-
-    /* Success Modal Overlay */
-    .success-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 15, 25, 0.92);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      padding: 20px;
-    }
-
-    .success-box {
-      background: var(--bg-card);
-      border: 2px solid var(--gold);
-      border-radius: 20px;
-      padding: 35px 25px;
-      max-width: 480px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-      animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0.85); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .success-icon {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: rgba(5, 150, 105, 0.15);
-      border: 3px solid var(--success);
-      color: var(--success);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      margin: 0 auto 16px;
-    }
-
-    .ref-badge {
-      background: var(--bg-input);
-      border: 1px dashed var(--gold);
-      padding: 8px 16px;
-      border-radius: 8px;
-      display: inline-block;
-      font-family: var(--font-lat);
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--gold-light);
-      margin: 14px 0;
-    }
-
-    .btn-wa-share {
-      background: #25d366;
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      font-family: var(--font-ar);
-      margin-top: 12px;
-    }
-
-    @media (max-width: 480px) {
-      .slots-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-  </style>
-  <link rel="stylesheet" href="polish.css?v=1.0">
-</head>
-<body>
-
-  <div class="barber-pole-top"></div>
-
-  <!-- Header -->
-  <header class="booking-header">
-    <img src="assets/logo.jpg" alt="شعار صالون سيد فرست" class="brand-logo">
-    <h1 class="shop-title">صالون سيد فرست (Sayed First)</h1>
-    <p class="shop-tagline">اختر الخدمة والحلاق والموعد المناسب، وأرسل طلب الحجز للريسبشن.</p>
-  </header>
-
-  <main class="container">
-
-    <!-- Step 1: Select Services -->
-    <div class="step-card">
-      <div class="step-title">
-        <span class="step-num">1</span>
-        <span>اختر الخدمات المطلوبة (يمكن اختيار أكثر من خدمة)</span>
-      </div>
-      <div class="services-grid" id="services-container">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-
-    <!-- Step 2: Date & Time -->
-    <div class="step-card">
-      <div class="step-title">
-        <span class="step-num">2</span>
-        <span>اختر التاريخ والوقت المناسب</span>
-      </div>
-
-      <div class="date-row" id="date-pill-container">
-        <!-- Next 5 days rendered dynamically -->
-      </div>
-
-      <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted); display:block; margin: 12px 0 8px;">الساعات المتاحة للحجز:</label>
-      <div class="slots-grid" id="time-slots-container">
-        <!-- Generated hours -->
-      </div>
-    </div>
-
-    <!-- Step 3: Client Info -->
-    <div class="step-card">
-      <div class="step-title">
-        <span class="step-num">3</span>
-        <span>بيانات التواصل</span>
-      </div>
-
-      <div class="form-group">
-        <label>الاسم بالكامل *</label>
-        <input type="text" class="form-control" id="client-name" placeholder="مثال: أحمد محمود" required>
-      </div>
-
-      <div class="form-group">
-        <label>رقم الهاتف / واتساب *</label>
-        <input type="tel" class="form-control" id="client-phone" placeholder="01012345678" required>
-      </div>
-
-      <div class="form-group">
-        <label>ملاحظات خاصة (اختياري)</label>
-        <input type="text" class="form-control" id="client-notes" placeholder="قصة شعر معينة، عناية خاصة...">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>حجز موعد أونلاين | صالون يوسف فريست - Youssef First</title>
+    <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#171a2b" />
+    <meta name="salon-api-base" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Lalezar&display=swap" />
+    <link rel="stylesheet" href="variables.css?v=1.0" />
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"
+    ></script>
+    <script defer src="firebase-config.js?v=2.7"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        line-height: 1.7;
+        padding-bottom: calc(120px + env(safe-area-inset-bottom));
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input {
+        font: inherit;
+        color: inherit;
+      }
+      .hero {
+        text-align: center;
+        padding: 52px 20px 34px;
+        max-width: 640px;
+        margin: auto;
+      }
+      .hero img {
+        width: 76px;
+        height: 76px;
+        border-radius: 22px;
+        object-fit: cover;
+        background: var(--tint);
+        box-shadow: 0 6px 20px rgba(23, 26, 43, 0.14);
+      }
+      .hero h1 {
+        margin-top: 18px;
+        font-size: clamp(1.55rem, 5vw, 2.05rem);
+        font-weight: 800;
+        letter-spacing: -0.4px;
+      }
+      .hero p {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 0.98rem;
+      }
+      main {
+        max-width: 640px;
+        margin: auto;
+        padding: 0 18px;
+      }
+      section {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 16px;
+      }
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+      }
+      h2 b {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: #fff;
+        font-size: 0.82rem;
+      }
+      h2 small {
+        margin-inline-start: auto;
+        font-weight: 500;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .list {
+        display: grid;
+        gap: 10px;
+      }
+      .svc {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        text-align: start;
+        padding: 14px 16px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+      .svc:hover {
+        border-color: #cfccc3;
+      }
+      .svc .ic {
+        font-size: 1.35rem;
+        width: 30px;
+        text-align: center;
+      }
+      .svc .nm {
+        flex: 1;
+        font-weight: 600;
+        font-size: 0.96rem;
+      }
+      .svc .ck {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1.5px solid #cfccc3;
+        display: grid;
+        place-items: center;
+        transition: 0.15s;
+      }
+      .svc .ck svg {
+        width: 12px;
+        height: 12px;
+        stroke: #fff;
+        opacity: 0;
+      }
+      .svc.on {
+        border-color: var(--ink);
+        background: var(--tint);
+      }
+      .svc.on .ck {
+        background: var(--ink);
+        border-color: var(--ink);
+      }
+      .svc.on .ck svg {
+        opacity: 1;
+      }
+      .dates {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        margin-bottom: 20px;
+        scrollbar-width: none;
+      }
+      .dates::-webkit-scrollbar {
+        display: none;
+      }
+      .date {
+        flex: 0 0 78px;
+        text-align: center;
+        padding: 12px 6px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--card);
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .date span {
+        display: block;
+        font-size: 0.76rem;
+        color: var(--muted);
+      }
+      .date strong {
+        display: block;
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+      .date.on {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+      .date.on span {
+        color: #c6c9d8;
+      }
+      .lbl {
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .slots {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+      .slot {
+        padding: 10px 0;
+        text-align: center;
+        font-size: 0.84rem;
+        font-weight: 600;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--card);
+        cursor: pointer;
+        direction: ltr;
+        transition: 0.15s;
+      }
+      .slot:hover {
+        border-color: #cfccc3;
+      }
+      .slot.on {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+      .field {
+        margin-bottom: 16px;
+      }
+      .field:last-child {
+        margin-bottom: 0;
+      }
+      .field label {
+        display: block;
+        font-size: 0.84rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .field input {
+        width: 100%;
+        height: 50px;
+        padding: 0 14px;
+        font-size: 16px;
+        background: #fff;
+        border: 1px solid #dcdad3;
+        border-radius: 12px;
+        transition: 0.15s;
+      }
+      .field input:focus {
+        outline: none;
+        border-color: var(--ink);
+        box-shadow: 0 0 0 3px rgba(23, 26, 43, 0.08);
+      }
+      .bar {
+        position: fixed;
+        inset: auto 0 0 0;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid var(--line);
+        padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+        z-index: 10;
+      }
+      .bar-in {
+        max-width: 640px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .sum {
+        flex: 1;
+        min-width: 0;
+      }
+      .sum div {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      .sum strong {
+        display: block;
+        font-size: 0.92rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .go {
+        flex: 0 0 auto;
+        height: 52px;
+        padding: 0 28px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--ink);
+        color: #fff;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .go:hover {
+        background: #2b3050;
+      }
+      .go:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+      .done {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(14, 17, 30, 0.55);
+        backdrop-filter: blur(4px);
+        z-index: 50;
+      }
+      .ticket {
+        width: min(100%, 420px);
+        background: #fff;
+        border-radius: 22px;
+        padding: 30px 24px 22px;
+        text-align: center;
+      }
+      .tick {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        background: #e8f4ed;
+        display: grid;
+        place-items: center;
+      }
+      .tick svg {
+        width: 26px;
+        height: 26px;
+        stroke: var(--ok);
+      }
+      .ticket h3 {
+        font-size: 1.3rem;
+        font-weight: 800;
+      }
+      .ticket > p {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 4px;
+      }
+      .ref {
+        display: inline-block;
+        margin: 16px 0;
+        padding: 6px 16px;
+        border: 1px dashed #c9c5ba;
+        border-radius: 8px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        direction: ltr;
+      }
+      .rows {
+        background: var(--paper);
+        border-radius: 14px;
+        padding: 14px 16px;
+        text-align: start;
+        font-size: 0.9rem;
+      }
+      .rows div {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 5px 0;
+      }
+      .rows span:first-child {
+        color: var(--muted);
+      }
+      .rows span:last-child {
+        font-weight: 600;
+        text-align: end;
+      }
+      .wa {
+        width: 100%;
+        height: 50px;
+        margin-top: 16px;
+        border: 0;
+        border-radius: 14px;
+        background: #1f9d55;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .again {
+        margin-top: 12px;
+        background: none;
+        border: 0;
+        color: var(--muted);
+        font-weight: 600;
+        cursor: pointer;
+      }
+      @media (max-width: 420px) {
+        .slots {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        section {
+          padding: 20px 16px;
+        }
+        .go {
+          padding: 0 20px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+      body { font-family:var(--font); background:var(--paper); color:var(--ink); padding-bottom:calc(110px + env(safe-area-inset-bottom)); }
+      .hero { max-width:none; padding:22px 18px 27px; background:var(--petrol); color:#fff; text-align:start; position:relative; }
+      .hero::after { content:""; height:7px; position:absolute; inset-inline:0; bottom:0; background:var(--pole); background-size:36px 36px; animation:yf-pole 2.4s linear infinite; }
+      .hero img { width:52px; height:52px; vertical-align:middle; border:0; border-radius:15px; box-shadow:none; }
+      .hero h1 { display:inline-block; margin:0 12px; vertical-align:middle; color:#fff; font:400 clamp(1.5rem,5vw,2rem)/1.2 var(--display); }
+      .hero p { max-width:620px; margin:8px auto 0; color:#d4e0dc; text-align:center; font-size:.9rem; }
+      main { max-width:680px; padding:18px 16px 20px; }
+      .booking-progress { display:flex; gap:7px; margin:0 0 16px; }
+      .booking-progress i { height:6px; flex:1; border-radius:99px; background:rgba(20,32,31,.14); }
+      .booking-progress i.done { background:var(--petrol); }
+      .booking-progress i.current { background:var(--pole); background-size:36px 36px; animation:yf-pole 2.4s linear infinite; }
+      .booking-step { display:none; }
+      .booking-step.active { display:block; animation:booking-enter .18s ease-out; }
+      @keyframes booking-enter { from { opacity:.65; transform:translateY(4px); } to { opacity:1; transform:none; } }
+      .barber-options { display:grid; gap:10px; }
+      .booking-barber { display:flex; align-items:center; gap:13px; width:100%; padding:13px 15px; border:1.5px solid var(--line); border-radius:17px; background:var(--card); text-align:start; font-weight:700; }
+      .booking-barber.selected { border-color:var(--petrol); background:var(--card-2); box-shadow:inset 0 0 0 1px var(--petrol); }
+      .booking-avatar { width:38px; height:38px; display:grid; place-items:center; flex:0 0 38px; border-radius:12px; background:var(--petrol); color:#fff; }
+      .booking-barber-check { margin-inline-start:auto; color:var(--petrol); opacity:0; }
+      .booking-barber.selected .booking-barber-check { opacity:1; }
+      .booking-review { display:grid; gap:2px; padding:12px 15px; margin-bottom:16px; border:1.5px dashed var(--line); border-radius:14px; background:var(--card-2); }
+      .booking-review > div { display:flex; justify-content:space-between; gap:12px; padding:5px 0; }
+      .booking-review span { color:var(--muted); }
+      .booking-review strong { text-align:end; }
+      .back { flex:0 0 auto; min-width:68px; height:52px; padding:0 17px; border:1.5px solid var(--line); border-radius:99px; background:transparent; color:var(--ink); font-weight:700; }
+      .back:hover { border-color:var(--petrol); }
+      .slot:disabled { opacity:.34; text-decoration:line-through; cursor:not-allowed; }
+      main > section { padding:19px; margin-bottom:13px; border:1.5px solid var(--line); border-radius:21px; background:var(--card); box-shadow:0 8px 24px rgba(20,32,31,.05); }
+      h2 { font:400 24px/1.2 var(--display); color:var(--ink); }
+      h2 b { flex:0 0 30px; width:30px; height:30px; border-radius:10px; background:var(--petrol); font:400 17px var(--display); }
+      h2 small { font:500 11px var(--font); }
+      .svc { border:1.5px solid var(--line); border-radius:17px; background:var(--card); padding:13px 15px; }
+      .svc:hover { border-color:var(--petrol); }
+      .svc.on { border-color:var(--petrol); background:var(--card-2); box-shadow:inset 0 0 0 1px var(--petrol); }
+      .svc .ic { color:var(--petrol); font-size:1.05rem; background:var(--card-2); border-radius:11px; width:34px; height:34px; display:grid; place-items:center; }
+      .svc .ck { border-radius:8px; border-color:var(--line); }
+      .svc.on .ck { background:var(--petrol); border-color:var(--petrol); }
+      .date { flex-basis:68px; border:1.5px solid var(--line); border-radius:16px; background:var(--card); }
+      .date.on { background:var(--ink); border-color:var(--ink); }
+      .date.on span { color:var(--paper); opacity:.72; }
+      .date strong, .ref, .sum strong { font-family:var(--display); font-weight:400; }
+      .slot { border:1.5px solid var(--line); border-radius:99px; background:var(--card); }
+      .slot.on { background:var(--petrol); border-color:var(--petrol); }
+      .field input { background:var(--card); border:1.5px solid var(--line); }
+      .field input:focus { border-color:var(--blue); box-shadow:0 0 0 4px rgba(43,94,167,.14); }
+      .bar { background:color-mix(in srgb,var(--paper) 92%,transparent); border-color:var(--line); backdrop-filter:blur(12px); }
+      .sum div { color:var(--muted); }
+      .sum strong { color:var(--ink); font-size:1rem; }
+      .go { border-radius:99px; background:var(--petrol); }
+      .go:hover { background:var(--petrol-2); }
+      .ticket { padding:0 24px 23px; overflow:hidden; border:1.5px solid var(--line); border-radius:22px; background:var(--card); box-shadow:0 24px 70px rgba(8,25,24,.2); }
+      .ticket::before { content:""; display:block; height:8px; margin:0 -24px 18px; background:var(--pole); background-size:36px 36px; animation:yf-pole 2.4s linear infinite; }
+      .ticket h3 { font:400 28px var(--display); }
+      .ref { border:2px dashed var(--line); border-radius:13px; }
+      .rows { background:var(--card-2); }
+      .wa { border-radius:99px; }
+      @keyframes yf-pole { to { background-position-y:36px; } }
+      @media (max-width:420px) { .hero { padding:18px 15px 25px; } .hero img { width:44px; height:44px; } main > section { padding:15px; } h2 { font-size:22px; } .bar { padding-inline:12px; } .go, .back { height:48px; padding-inline:16px; } .back { min-width:60px; } .booking-review > div { flex-direction:column; gap:1px; } .booking-review strong { text-align:start; } }
+      @media (prefers-reduced-motion:reduce) { .hero::after,.ticket::before { animation:none; } }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <img src="assets/logo.jpg" alt="شعار صالون يوسف فريست" />
+      <h1>صالون يوسف فريست</h1>
+      <p>احجز موعدك في أربع خطوات بسيطة</p>
+    </header>
+
+    <main>
+      <div class="booking-progress" id="booking-progress" aria-label="خطوات الحجز"><i class="current"></i><i></i><i></i><i></i></div>
+      <section class="booking-step active" data-step="0">
+        <h2><b>1</b>الخدمات<small>يمكن اختيار أكثر من خدمة</small></h2>
+        <div class="list" id="services-container"></div>
+      </section>
+
+      <section class="booking-step" data-step="1">
+        <h2><b>2</b>الحلاق<small>اختر حلاقاً أو اترك الاختيار للاستقبال</small></h2>
+        <div class="barber-options" id="booking-barbers"></div>
+      </section>
+
+      <section class="booking-step" data-step="2">
+        <h2><b>3</b>الموعد<small>اختر اليوم والساعة المناسبة</small></h2>
+        <div class="dates" id="date-pill-container"></div>
+        <div class="lbl">الساعات المتاحة</div>
+        <div class="slots" id="time-slots-container"></div>
+      </section>
+
+      <section class="booking-step" data-step="3">
+        <h2><b>4</b>بياناتك<small>راجع تفاصيل الحجز قبل التأكيد</small></h2>
+        <div class="booking-review" id="booking-review"></div>
+        <div class="field">
+          <label for="client-name">الاسم بالكامل</label
+          ><input
+            id="client-name"
+            type="text"
+            placeholder="أحمد محمود"
+            autocomplete="name"
+          />
+        </div>
+        <div class="field">
+          <label for="client-phone">رقم الهاتف / واتساب</label
+          ><input
+            id="client-phone"
+            type="tel"
+            placeholder="01012345678"
+            autocomplete="tel"
+            inputmode="tel"
+          />
+        </div>
+        <div class="field">
+          <label for="client-notes">ملاحظات (اختياري)</label
+          ><input
+            id="client-notes"
+            type="text"
+            placeholder="قصة شعر معينة، عناية خاصة..."
+          />
+        </div>
+      </section>
+    </main>
+
+    <div class="bar">
+      <div class="bar-in">
+        <button class="back" id="btn-booking-back" type="button" style="display:none;">رجوع</button>
+        <div class="sum">
+          <div id="sum-datetime">--</div>
+          <strong id="sum-services">--</strong>
+        </div>
+        <button class="go" id="btn-confirm-booking">التالي</button>
       </div>
     </div>
 
-    <!-- Booking Summary Card -->
-    <div class="summary-card">
-      <div class="summary-row">
-        <span style="color:var(--text-muted);">الخدمات المختارة:</span>
-        <span id="sum-services" style="font-weight:700;">قص شعر كلاسيكي</span>
-      </div>
-      <div class="summary-row">
-        <span style="color:var(--text-muted);">الموعد:</span>
-        <span id="sum-datetime" style="font-weight:700;">--/--</span>
+    <div class="done" id="success-modal">
+      <div class="ticket">
+        <div class="tick">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="2.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </div>
+        <h3>تم تسجيل حجزك</h3>
+        <p>وصل حجزك للاستقبال، وفي انتظارك.</p>
+        <div class="ref" id="success-ref">SF-0000</div>
+        <div class="rows">
+          <div><span>العميل</span><span id="res-client"></span></div>
+          <div><span>الحلاق</span><span id="res-barber"></span></div>
+          <div><span>الموعد</span><span id="res-time"></span></div>
+          <div><span>الخدمات</span><span id="res-services"></span></div>
+        </div>
+        <button class="wa" id="btn-wa-confirm">
+          إرسال التفاصيل عبر واتساب
+        </button>
+        <button class="again" onclick="location.reload()">حجز موعد آخر</button>
       </div>
     </div>
 
-    <button class="btn-submit-booking" id="btn-confirm-booking">
-      <i class="fa-solid fa-calendar-check"></i>
-      <span>إرسال طلب الحجز</span>
-    </button>
+    <script src="api-client.js?v=1.2"></script>
+    <script>
+      let savedSalonData = null;
+      try {
+        const raw = localStorage.getItem("barbershop_data_v1");
+        if (raw) savedSalonData = JSON.parse(raw);
+      } catch (e) {}
 
-  </main>
+      const REAL_CATALOG = [
+        { id: 1001, name: "قص شعر", price: 150, icon: "fa-scissors" },
+        { id: 1002, name: "ماسك", price: 20, icon: "fa-spa" },
+        { id: 1003, name: "حلاقة ذقن موس", price: 60, icon: "fa-scissors" },
+        { id: 1004, name: "حلاقة ذقن ماكينة", price: 30, icon: "fa-shop" },
+        { id: 1005, name: "تدريج ذقن", price: 70, icon: "fa-scissors" },
+        { id: 1006, name: "استشوار", price: 70, icon: "fa-wind" },
+        { id: 1007, name: "جلسة سبا عادي", price: 100, icon: "fa-spa" },
+        { id: 1008, name: "جلسة سبا ديتوكس", price: 250, icon: "fa-spa" },
+        { id: 1009, name: "جلسة سبا VIP", price: 600, icon: "fa-crown" },
+        { id: 1010, name: "ساونا", price: 250, icon: "fa-fire" },
+        { id: 1011, name: "مشروب", price: 0, icon: "fa-glass-water" },
+        { id: 1012, name: "حمام مغربي", price: 150, icon: "fa-spa" },
+        { id: 1013, name: "مانيكير كامل", price: 150, icon: "fa-hand" },
+        { id: 1014, name: "صبغة لون أسود شعر كامل", price: 150, icon: "fa-palette" },
+        { id: 1015, name: "حمام سنفرة", price: 350, icon: "fa-spa" },
+        { id: 1016, name: "واكسي", price: 70, icon: "fa-star" },
+        { id: 1017, name: "فتلة", price: 40, icon: "fa-scissors" },
+        { id: 1018, name: "جلسة بانثينول", price: 150, icon: "fa-bottle-water" },
+        { id: 1019, name: "جلسة النانو", price: 170, icon: "fa-bottle-water" },
+        { id: 1020, name: "كيراتين رجالي", price: 100, icon: "fa-bottle-water" },
+        { id: 1021, name: "قص شعر ودقن ماسك فيس", price: 200, icon: "fa-shop" },
+        { id: 1022, name: "سيشوار صغير", price: 180, icon: "fa-wind" },
+        { id: 1023, name: "بروتين", price: 600, icon: "fa-bottle-water" },
+        { id: 1025, name: "هاي لايت", price: 250, icon: "fa-palette" },
+        { id: 1026, name: "تحديد شعر ودقن ماسك فيس", price: 150, icon: "fa-shop" },
+        { id: 1027, name: "هاي لايت شعر كامل بيبي", price: 400, icon: "fa-palette" },
+        { id: 1028, name: "واكس", price: 50, icon: "fa-star" },
+        { id: 1029, name: "حمام كريم Bio B", price: 200, icon: "fa-bottle-water" },
+        { id: 1101, name: "عرض الملك", price: 350, icon: "fa-crown" },
+        { id: 1102, name: "عرض الخميس", price: 400, icon: "fa-gift" },
+        { id: 1103, name: "باكدج العريس مميز", price: 900, icon: "fa-user-tie" },
+        { id: 1104, name: "باكدج العريس خارجي", price: 1800, icon: "fa-user-tie" },
+        { id: 1105, name: "عرض باكدج العريس خارجي", price: 2200, icon: "fa-user-tie" },
+        { id: 1106, name: "عرض الانتعاش", price: 300, icon: "fa-star" },
+        { id: 1107, name: "باقة البرونز", price: 250, icon: "fa-medal" },
+        { id: 1108, name: "VIP باكدج العريس", price: 1500, icon: "fa-crown" },
+      ];
 
-  <!-- Success Confirmation Modal -->
-  <div class="success-overlay" id="success-modal">
-    <div class="success-box">
-      <div class="success-icon"><i class="fa-solid fa-check"></i></div>
-      <h2 style="font-size:1.5rem; font-weight:900; color:#fff; margin-bottom:6px;">تم تسجيل حجزك بنجاح!</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem;">تم إرسال حجزك مباشرة إلى ريسبشن صالون سيد فرست وسنكون في انتظارك.</p>
+      const oldDemoServiceNames = new Set([
+        "قص شعر كلاسيكي وتصفيف",
+        "قص شعر حديث (سكين فيد Fade)",
+        "تحديد وتشذيب اللحية بموس ساخن",
+        "صبغة وتلوين اللحية والشعر الأبيض",
+        "استشوار وغسيل مع مساج فروة الرأس",
+        "تنظيف بشرة عميق بجهاز البخار",
+        "ماسك الذهب الأسود وإزالة الرؤوس السوداء",
+        "جلسة بروتين وكيراتين برازيلي معالج",
+        "باقة VIP المتكاملة (شعر + لحية + بخار + ماسك)",
+        "باقة العريس الملكية الخاصة",
+      ]);
+      const savedSalonServices =
+        savedSalonData && Array.isArray(savedSalonData.services)
+          ? savedSalonData.services
+              .filter((s) => !oldDemoServiceNames.has(s.name))
+              .map((s) => ({
+                id: s.id,
+                name: s.name,
+                price: Number(s.price) || 0,
+                icon: s.icon || "",
+              }))
+          : null;
+      const CATALOG = savedSalonServices
+        ? (() => {
+            const current = savedSalonServices.map((saved) => {
+              const actual = REAL_CATALOG.find((s) => s.name === saved.name);
+              return actual ? { ...actual, id: saved.id } : saved;
+            });
+            REAL_CATALOG.forEach((actual) => {
+              if (!current.some((s) => s.name === actual.name))
+                current.push(actual);
+            });
+            return current;
+          })()
+        : REAL_CATALOG;
 
-      <div class="ref-badge" id="success-ref">REF-0000</div>
+      const TIME_SLOTS = Array.from({ length: 25 }, (_, index) => {
+        const minutes = 11 * 60 + index * 30;
+        const hour24 = Math.floor(minutes / 60);
+        const hour12 = hour24 % 12 || 12;
+        return `${String(hour12).padStart(2, "0")}:${minutes % 60 === 0 ? "00" : "30"} ${hour24 < 12 ? "AM" : "PM"}`;
+      });
+      const REAL_BARBERS = (Array.isArray(savedSalonData?.barbers) ? savedSalonData.barbers : []).map((barber) => ({
+        id: String(barber.id ?? barber.barberID ?? barber.BarberID ?? ""),
+        name: String(barber.name ?? barber.fullName ?? barber.FullName ?? "").trim(),
+      })).filter((barber) => barber.id && barber.name);
 
-      <div style="background:var(--bg-input); padding:14px; border-radius:12px; margin: 15px 0; text-align:right; font-size:0.88rem; line-height:1.7;">
-        <div>👤 <strong>العميل:</strong> <span id="res-client"></span></div>
-        <div>📅 <strong>الموعد:</strong> <span id="res-time"></span></div>
-        <div>📋 <strong>الخدمات:</strong> <span id="res-services"></span></div>
-      </div>
+      let selectedServices = [CATALOG[0]];
+      let selectedDate = localDateISO(new Date());
+      let selectedTime = "";
+      let selectedBarber = { id: "any", name: "أي حلاق متاح" };
+      let bookingStep = 0;
+      let lastBookingPayload = null;
 
-      <button class="btn-wa-share" id="btn-wa-confirm">
-        <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i>
-        <span>إرسال تفاصيل الحجز عبر واتساب للمحل</span>
-      </button>
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const CHECK =
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-      <button style="background:transparent; border:none; color:var(--text-muted); margin-top:16px; cursor:pointer; font-weight:700; font-family:var(--font-ar);" onclick="location.reload();">
-        حجز موعد آخر ←
-      </button>
-    </div>
-  </div>
+      function localDateISO(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      }
 
-  <script src="api-client.js?v=1.2"></script>
-  <script>
-    let savedSalonData = null;
-    try {
-      const raw = localStorage.getItem('barbershop_data_v1');
-      if (raw) savedSalonData = JSON.parse(raw);
-    } catch (e) {}
+      function timeToMinutes(value) {
+        const match = String(value || "").trim().match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/i);
+        if (!match) return -1;
+        let hour = Number(match[1]);
+        const minute = Number(match[2]);
+        if (match[3]) {
+          const meridiem = match[3].toUpperCase();
+          if (meridiem === "AM" && hour === 12) hour = 0;
+          if (meridiem === "PM" && hour !== 12) hour += 12;
+        }
+        return hour * 60 + minute;
+      }
 
-    let savedSalonServices = (savedSalonData && savedSalonData.services && savedSalonData.services.length > 0)
-      ? savedSalonData.services.map(s => ({ id: s.id, name: s.name, icon: s.icon || '✂️' }))
-      : null;
+      function isSlotUnavailable(date, slot) {
+        const slotMinutes = timeToMinutes(slot);
+        if (date === localDateISO(new Date())) {
+          const now = new Date();
+          if (slotMinutes <= now.getHours() * 60 + now.getMinutes() + 15) return true;
+        }
+        return (savedSalonData?.appointments || []).some((appointment) => {
+          const status = String(appointment.status || "confirmed").toLowerCase();
+          return appointment.date === date && status !== "cancelled" && status !== "canceled" && timeToMinutes(appointment.time) === slotMinutes;
+        });
+      }
 
-    const CATALOG = savedSalonServices || [
-      { id: 1, name: 'قص شعر كلاسيكي وتصفيف', icon: '✂️' },
-      { id: 2, name: 'تحديد وتشذيب اللحية بالبخار', icon: '💈' },
-      { id: 3, name: 'حمام كريم وماسك صنفرة الوجه', icon: '🧖' },
-      { id: 4, name: 'باقة سيد فرست VIP الملكية', icon: '👑' },
-      { id: 5, name: 'بروتين معالج للشعر', icon: '🧴' },
-      { id: 6, name: 'صبغة وتلوين اللحية والشعر', icon: '🎨' }
-    ];
+      function showBookingStep(step) {
+        bookingStep = Math.max(0, Math.min(3, step));
+        document.querySelectorAll(".booking-step").forEach((section, index) => section.classList.toggle("active", index === bookingStep));
+        document.querySelectorAll("#booking-progress i").forEach((bar, index) => {
+          bar.classList.toggle("done", index < bookingStep);
+          bar.classList.toggle("current", index === bookingStep);
+        });
+        $("btn-booking-back").style.display = bookingStep > 0 ? "inline-flex" : "none";
+        $("btn-confirm-booking").textContent = bookingStep === 3 ? "تأكيد الحجز" : "التالي";
+        updateSummary();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
 
-    const TIME_SLOTS = [
-      '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM',
-      '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM',
-      '05:00 PM', '05:30 PM', '06:00 PM', '06:30 PM',
-      '07:00 PM', '07:30 PM', '08:00 PM', '08:30 PM',
-      '09:00 PM', '09:30 PM', '10:00 PM', '10:30 PM',
-      '11:00 PM', '11:30 PM'
-    ];
+      function renderBarbers() {
+        const options = [{ id: "any", name: "أي حلاق متاح" }, ...REAL_BARBERS];
+        if (selectedBarber.id !== "any" && !options.some((barber) => barber.id === selectedBarber.id)) selectedBarber = options[0];
+        $("booking-barbers").innerHTML = options.map((barber) => `
+          <button type="button" class="booking-barber ${selectedBarber.id === barber.id ? "selected" : ""}" data-id="${esc(barber.id)}">
+            <span class="booking-avatar"><i class="fa-solid ${barber.id === "any" ? "fa-users" : "fa-user"}"></i></span>
+            <span>${esc(barber.name)}</span><i class="fa-solid fa-check booking-barber-check"></i>
+          </button>`).join("");
+      }
 
-    let selectedServices = [CATALOG[0]];
-    let selectedDate = new Date().toISOString().split('T')[0];
-    let selectedTime = '06:00 PM';
-    let lastBookingPayload = null;
+      function renderServices() {
+        $("services-container").innerHTML = CATALOG.map((srv) => {
+          const on = selectedServices.some((s) => s.id === srv.id);
+          return `<button type="button" class="svc ${on ? "on" : ""}" data-id="${esc(srv.id)}">
+      <span class="ic"><i class="fa-solid ${esc(/^fa-[a-z0-9-]+$/.test(srv.icon) ? srv.icon : "fa-scissors")}"></i></span><span class="nm">${esc(srv.name)}</span><span class="ck">${CHECK}</span></button>`;
+        }).join("");
+        updateSummary();
+      }
 
-    // Render Services
-    function renderServices() {
-      const container = document.getElementById('services-container');
-      container.innerHTML = CATALOG.map(srv => {
-        const isSel = selectedServices.some(s => s.id === srv.id);
-        return `
-          <div class="service-item-card ${isSel ? 'selected' : ''}" onclick="toggleService(${srv.id})">
-            <div class="service-icon">${srv.icon}</div>
-            <div class="service-details">
-              <div class="service-name">${srv.name}</div>
-            </div>
-            <div class="service-check"><i class="fa-solid fa-check"></i></div>
-          </div>
-        `;
-      }).join('');
-      updateSummary();
-    }
+      function toggleService(id) {
+        const srv = CATALOG.find((s) => String(s.id) === String(id));
+        if (!srv) return;
+        const idx = selectedServices.findIndex((s) => s.id === srv.id);
+        if (idx > -1) {
+          if (selectedServices.length > 1) selectedServices.splice(idx, 1);
+          else {
+            alert("يرجى اختيار خدمة واحدة على الأقل");
+            return;
+          }
+        } else selectedServices.push(srv);
+        renderServices();
+      }
 
-    function toggleService(id) {
-      const srv = CATALOG.find(s => s.id === id);
-      if (!srv) return;
-      const idx = selectedServices.findIndex(s => s.id === id);
-      if (idx > -1) {
-        if (selectedServices.length > 1) {
-          selectedServices.splice(idx, 1);
-        } else {
-          alert('يرجى اختيار خدمة واحدة على الأقل');
+      function renderDates() {
+        const dayNames = [
+          "الأحد",
+          "الإثنين",
+          "الثلاثاء",
+          "الأربعاء",
+          "الخميس",
+          "الجمعة",
+          "السبت",
+        ];
+        let html = "";
+        for (let i = 0; i < 10; i++) {
+          const d = new Date();
+          d.setDate(d.getDate() + i);
+          const iso = localDateISO(d);
+          const label =
+            i === 0 ? "اليوم" : i === 1 ? "غداً" : dayNames[d.getDay()];
+          html += `<div class="date ${iso === selectedDate ? "on" : ""}" data-iso="${iso}"><span>${label}</span><strong>${d.getDate()}/${d.getMonth() + 1}</strong></div>`;
+        }
+        $("date-pill-container").innerHTML = html;
+      }
+
+      function renderSlots() {
+        const unavailable = new Set(TIME_SLOTS.filter((slot) => isSlotUnavailable(selectedDate, slot)));
+        if (!selectedTime || unavailable.has(selectedTime)) selectedTime = TIME_SLOTS.find((slot) => !unavailable.has(slot)) || "";
+        $("time-slots-container").innerHTML = TIME_SLOTS.map((slot) =>
+          `<button type="button" class="slot ${slot === selectedTime ? "on" : ""}" data-slot="${slot}" ${unavailable.has(slot) ? "disabled" : ""}>${slot}</button>`,
+        ).join("");
+      }
+
+      function updateSummary() {
+        $("sum-services").textContent =
+          selectedServices.map((s) => s.name).join(" + ");
+        $("sum-datetime").textContent = `${selectedDate} · ${selectedTime || "اختر الوقت"}`;
+        $("booking-review").innerHTML = `
+          <div><span>الخدمات</span><strong>${selectedServices.map((s) => esc(s.name)).join("، ")}</strong></div>
+          <div><span>الحلاق</span><strong>${esc(selectedBarber.name)}</strong></div>
+          <div><span>الموعد</span><strong>${esc(selectedDate)} · ${esc(selectedTime || "لم يتم اختيار الوقت")}</strong></div>`;
+      }
+
+      $("services-container").addEventListener("click", (e) => {
+        const b = e.target.closest(".svc");
+        if (b) toggleService(b.dataset.id);
+      });
+      $("date-pill-container").addEventListener("click", (e) => {
+        const d = e.target.closest(".date");
+        if (d) {
+          selectedDate = d.dataset.iso;
+          renderDates();
+          renderSlots();
+          updateSummary();
+        }
+      });
+      $("time-slots-container").addEventListener("click", (e) => {
+        const s = e.target.closest(".slot");
+        if (s && !s.disabled) {
+          selectedTime = s.dataset.slot;
+          renderSlots();
+          updateSummary();
+        }
+      });
+
+      $("booking-barbers").addEventListener("click", (e) => {
+        const option = e.target.closest(".booking-barber");
+        if (!option) return;
+        const picked = [{ id: "any", name: "أي حلاق متاح" }, ...REAL_BARBERS].find((barber) => barber.id === option.dataset.id);
+        if (!picked) return;
+        selectedBarber = picked;
+        renderBarbers();
+        updateSummary();
+      });
+
+      $("btn-booking-back").addEventListener("click", () => showBookingStep(bookingStep - 1));
+
+      // Submit — API flow unchanged: .NET API -> Cloud DB -> local fallback
+      $("btn-confirm-booking").addEventListener("click", async () => {
+        if (bookingStep < 3) {
+          if (bookingStep === 0 && selectedServices.length === 0) {
+            alert("يرجى اختيار خدمة واحدة على الأقل");
+            return;
+          }
+          if (bookingStep === 2 && !selectedTime) {
+            alert("لا توجد مواعيد متاحة في هذا اليوم، اختر يوماً آخر");
+            return;
+          }
+          showBookingStep(bookingStep + 1);
           return;
         }
-      } else {
-        selectedServices.push(srv);
-      }
-      renderServices();
-    }
+        const name = $("client-name").value.trim();
+        const phone = $("client-phone").value.trim();
+        const notes = $("client-notes").value.trim();
 
-    // Render Dates
-    function renderDates() {
-      const container = document.getElementById('date-pill-container');
-      const days = [];
-      const dayNames = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-
-      for (let i = 0; i < 6; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-        const iso = d.toISOString().split('T')[0];
-        const dayLabel = i === 0 ? 'اليوم' : (i === 1 ? 'غداً' : dayNames[d.getDay()]);
-        days.push({ iso, dayLabel, dayNum: d.getDate(), month: d.getMonth() + 1 });
-      }
-
-      container.innerHTML = days.map((d, idx) => `
-        <div class="date-pill ${d.iso === selectedDate ? 'selected' : ''}" onclick="selectDate('${d.iso}')">
-          <span class="day-name">${d.dayLabel}</span>
-          <span class="day-num">${d.dayNum}/${d.month}</span>
-        </div>
-      `).join('');
-    }
-
-    function selectDate(iso) {
-      selectedDate = iso;
-      renderDates();
-      updateSummary();
-    }
-
-    // Render Time Slots
-    function renderSlots() {
-      const container = document.getElementById('time-slots-container');
-      container.innerHTML = TIME_SLOTS.map(slot => `
-        <div class="slot-pill ${slot === selectedTime ? 'selected' : ''}" onclick="selectTime('${slot}')">
-          ${slot}
-        </div>
-      `).join('');
-    }
-
-    function selectTime(slot) {
-      selectedTime = slot;
-      renderSlots();
-      updateSummary();
-    }
-
-    // Update Summary Box
-    function updateSummary() {
-      const srvNames = selectedServices.map(s => s.name).join(' + ');
-      document.getElementById('sum-services').textContent = srvNames;
-      document.getElementById('sum-datetime').textContent = `${selectedDate} - ${selectedTime}`;
-    }
-
-    // Handle Submit
-    document.getElementById('btn-confirm-booking').addEventListener('click', async () => {
-      const name = document.getElementById('client-name').value.trim();
-      const phone = document.getElementById('client-phone').value.trim();
-      const notes = document.getElementById('client-notes').value.trim();
-
-      if (!name) {
-        alert('يرجى كتابة اسمك الكريم');
-        document.getElementById('client-name').focus();
-        return;
-      }
-
-      if (!phone || phone.length < 10) {
-        alert('يرجى إدخال رقم هاتف صحيح للتواصل وتأكيد الحجز');
-        document.getElementById('client-phone').focus();
-        return;
-      }
-
-      const bookingRef = 'SF-' + Math.floor(1000 + Math.random() * 9000);
-
-      const payload = {
-        bookingRef,
-        name,
-        phone,
-        notes,
-        barberId: 'any',
-        barberName: 'حجز عام',
-        services: selectedServices.map(s => s.name),
-        total: 0,
-        date: selectedDate,
-        time: selectedTime
-      };
-
-      lastBookingPayload = payload;
-
-      // Submit to .NET Backend API / Cloud Database
-      const btn = document.getElementById('btn-confirm-booking');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري تأكيد الحجز...';
-
-      let result = { success: false };
-
-      // 1. Primary: .NET 8 Backend API -> Microsoft SQL Server
-      if (window.SalonApi && typeof window.SalonApi.bookAppointment === 'function') {
-        try {
-          result = await window.SalonApi.bookAppointment(payload);
-        } catch (err) {
-          console.warn('.NET API booking attempt:', err);
+        if (!name) {
+          alert("يرجى كتابة اسمك الكريم");
+          $("client-name").focus();
+          return;
         }
-      }
-
-      // 2. Secondary: Cloud DB if available
-      if (!result.success && window.SalonCloudDB && typeof window.SalonCloudDB.createOnlineBooking === 'function') {
-        try {
-          result = await window.SalonCloudDB.createOnlineBooking(payload);
-        } catch (err) {
-          console.warn('Cloud DB booking attempt:', err);
+        if (!/^01[0-9]{9}$/.test(phone.replace(/\s/g, ""))) {
+          alert("يرجى إدخال رقم هاتف صحيح للتواصل وتأكيد الحجز");
+          $("client-phone").focus();
+          return;
         }
-      }
 
-      // 3. Fallback: Local reception queue storage so booking is always preserved
-      if (!result.success) {
-        try {
-          const raw = localStorage.getItem('barbershop_data_v1');
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (!parsed.appointments) parsed.appointments = [];
-            parsed.appointments.unshift({
-              id: 'apt_' + Date.now(),
-              name: payload.name,
-              phone: payload.phone,
-              date: payload.date,
-              time: payload.time,
-              barberId: 'any',
-              services: payload.services.join(', '),
-              status: 'confirmed'
-            });
-            localStorage.setItem('barbershop_data_v1', JSON.stringify(parsed));
+        const bookingRef = "SF-" + Math.floor(1000 + Math.random() * 9000);
+        const payload = {
+          bookingRef,
+          name,
+          phone,
+          notes,
+          barberId: selectedBarber.id,
+          barberName: selectedBarber.id === "any" ? "حجز عام" : selectedBarber.name,
+          services: selectedServices.map((s) => s.name),
+          total: selectedServices.reduce(
+            (sum, s) => sum + (Number(s.price) || 0),
+            0,
+          ),
+          date: selectedDate,
+          time: selectedTime,
+        };
+        lastBookingPayload = payload;
+
+        const btn = $("btn-confirm-booking");
+        btn.disabled = true;
+        btn.textContent = "جاري التأكيد...";
+
+        let result = { success: false };
+
+        if (
+          window.SalonApi &&
+          typeof window.SalonApi.bookAppointment === "function"
+        ) {
+          try {
+            result = await window.SalonApi.bookAppointment(payload);
+          } catch (err) {
+            console.warn(".NET API booking attempt:", err);
           }
-          result = { success: true };
-        } catch (e) {
-          result = { success: true };
         }
-      }
 
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> إرسال طلب الحجز';
+        if (
+          !result.success &&
+          window.SalonCloudDB &&
+          typeof window.SalonCloudDB.createOnlineBooking === "function"
+        ) {
+          try {
+            result = await window.SalonCloudDB.createOnlineBooking(payload);
+          } catch (err) {
+            console.warn("Cloud DB booking attempt:", err);
+          }
+        }
 
-      if (result.success) {
-        // Show success modal
-        document.getElementById('success-ref').textContent = bookingRef;
-        document.getElementById('res-client').textContent = name;
-        document.getElementById('res-time').textContent = `${selectedDate} الساعة ${selectedTime}`;
-        document.getElementById('res-services').textContent = selectedServices.map(s => s.name).join(' + ');
+        if (!result.success) {
+          try {
+            const raw = localStorage.getItem("barbershop_data_v1");
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (!parsed.appointments) parsed.appointments = [];
+              parsed.appointments.unshift({
+                id: "apt_" + Date.now(),
+                name: payload.name,
+                phone: payload.phone,
+                date: payload.date,
+                time: payload.time,
+                barberId: payload.barberId,
+                services: payload.services.join(", "),
+                status: "confirmed",
+              });
+              localStorage.setItem(
+                "barbershop_data_v1",
+                JSON.stringify(parsed),
+              );
+            }
+            result = { success: true };
+          } catch (e) {
+            result = { success: true };
+          }
+        }
 
-        document.getElementById('success-modal').style.display = 'flex';
-      } else {
-        alert('حدث خطأ أثناء إرسال الحجز، يرجى المحاولة مرة أخرى أو التواصل معنا عبر الهاتف.');
-      }
-    });
+        btn.disabled = false;
+        btn.textContent = "تأكيد الحجز";
 
-    // WhatsApp Direct Confirmation
-    document.getElementById('btn-wa-confirm').addEventListener('click', () => {
-      if (!lastBookingPayload) return;
-      const msg = `💈 *حجز موعد جديد - صالون سيد فرست*\n`
-        + `🔖 *كود الحجز:* #${lastBookingPayload.bookingRef}\n`
-        + `👤 *العميل:* ${lastBookingPayload.name}\n`
-        + `📞 *الهاتف:* ${lastBookingPayload.phone}\n`
-        + `📅 *الموعد:* ${lastBookingPayload.date} الساعة ${lastBookingPayload.time}\n`
-        + `📋 *الخدمات:* ${lastBookingPayload.services.join(' + ')}\n`
-        + (lastBookingPayload.notes ? `📝 *ملاحظات:* ${lastBookingPayload.notes}\n` : '')
-        + `\nبرجاء تأكيد حجز الموعد وشكراً لكم! ✨`;
+        if (result.success) {
+          $("success-ref").textContent = bookingRef;
+          $("res-client").textContent = name;
+          $("res-barber").textContent = selectedBarber.name;
+          $("res-time").textContent = `${selectedDate} — ${selectedTime}`;
+          $("res-services").textContent = selectedServices
+            .map((s) => s.name)
+            .join(" + ");
+          $("success-modal").style.display = "flex";
+        } else {
+          alert(
+            "حدث خطأ أثناء إرسال الحجز، يرجى المحاولة مرة أخرى أو التواصل معنا عبر الهاتف.",
+          );
+        }
+      });
 
-      const shopPhone = '201032232541'; // Salon Reception WhatsApp
-      window.open(`https://wa.me/${shopPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-    });
+      $("btn-wa-confirm").addEventListener("click", () => {
+        if (!lastBookingPayload) return;
+        const p = lastBookingPayload;
+        const msg =
+          ` *حجز موعد جديد - صالون يوسف فريست*\n` +
+          ` *كود الحجز:* #${p.bookingRef}\n` +
+          ` *العميل:* ${p.name}\n` +
+          ` *الهاتف:* ${p.phone}\n` +
+          ` *الموعد:* ${p.date} الساعة ${p.time}\n` +
+          ` *الخدمات:* ${p.services.join(" + ")}\n` +
+          (p.notes ? ` *ملاحظات:* ${p.notes}\n` : "") +
+          `\nبرجاء تأكيد حجز الموعد وشكراً لكم! `;
+        window.open(
+          `https://wa.me/201032232541?text=${encodeURIComponent(msg)}`,
+          "_blank",
+        );
+      });
 
-    // Initialize
-    renderServices();
-    renderDates();
-    renderSlots();
-  </script>
-</body>
+      renderServices();
+      renderBarbers();
+      renderDates();
+      renderSlots();
+      showBookingStep(0);
+    </script>
+  </body>
 </html>

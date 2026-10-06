@@ -1,0 +1,96 @@
+/* Youssef First design tokens. Keep visual tokens centralized here. */
+:root {
+  color-scheme: light;
+  --ink: #14201f;
+  --petrol: #0e3433;
+  --petrol-2: #164746;
+  --paper: #f2ede2;
+  --card: #fffcf5;
+  --card-2: #f7f2e7;
+  --line: rgba(20, 32, 31, .14);
+  --muted: #6b7471;
+  --accent: #e0472f;
+  --accent-d: #bf3420;
+  --blue: #2b5ea7;
+  --ok: #2f7d5b;
+  --warn: #b97a10;
+  --danger: #c0392b;
+  --ok-soft: #dcefe5;
+  --accent-soft: #fbe3dd;
+  --display: 'Lalezar', 'IBM Plex Sans Arabic', sans-serif;
+  --font: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --pole: repeating-linear-gradient(135deg, #e0472f 0 9px, #fffcf5 9px 18px, #2b5ea7 18px 27px, #fffcf5 27px 36px);
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-pill: 99px;
+  --shadow-card: 0 8px 24px rgba(20, 32, 31, .055);
+  --shadow-pop: 0 24px 70px rgba(8, 25, 24, .2);
+
+  /* Compatibility aliases used by the existing application scripts/styles. */
+  --bg-body: var(--paper);
+  --bg-sidebar: var(--petrol);
+  --bg-card: var(--card);
+  --bg-card-hover: var(--card-2);
+  --bg-surface: var(--card-2);
+  --bg-input: var(--card);
+  --tint: var(--card-2);
+  --gold: var(--accent);
+  --gold-light: var(--accent-d);
+  --gold-dark: #8f2a1d;
+  --gold-glow: rgba(224, 71, 47, .18);
+  --gold-gradient: linear-gradient(135deg, #e0472f, #bf3420);
+  --gold-gradient-soft: var(--accent-soft);
+  --primary: var(--petrol);
+  --primary-rgb: 14, 52, 51;
+  --danger-bg: #fbe3dd;
+  --danger-glow: rgba(192, 57, 43, .14);
+  --success: var(--ok);
+  --success-bg: var(--ok-soft);
+  --success-glow: rgba(47, 125, 91, .14);
+  --warning: var(--warn);
+  --warning-bg: #f7e8c9;
+  --warning-glow: rgba(185, 122, 16, .14);
+  --info: var(--blue);
+  --info-bg: #e5edf8;
+  --info-glow: rgba(43, 94, 167, .14);
+  --text-main: var(--ink);
+  --text-muted: var(--muted);
+  --text-dim: #7e8985;
+  --border-gold: rgba(224, 71, 47, .35);
+  --border-subtle: var(--line);
+  --border-input: rgba(20, 32, 31, .24);
+  --border-radius-sm: var(--r-sm);
+  --border-radius: var(--r-md);
+  --border-radius-lg: var(--r-lg);
+  --shadow-sm: 0 2px 8px rgba(20, 32, 31, .045);
+  --shadow-md: var(--shadow-card);
+  --shadow-gold: 0 5px 18px rgba(224, 71, 47, .15);
+  --shadow-modal: var(--shadow-pop);
+  --font-arabic: var(--font);
+  --font-latin: var(--font);
+}
+
+body.dark-theme {
+  color-scheme: dark;
+  --ink: #f2ede2;
+  --petrol: #1b5654;
+  --petrol-2: #236a67;
+  --paper: #0b1514;
+  --card: #121f1e;
+  --card-2: #182827;
+  --line: rgba(242, 237, 226, .14);
+  --muted: #a3b0ad;
+  --accent: #f0745e;
+  --accent-d: #ff8974;
+  --blue: #83aeea;
+  --ok: #66bd91;
+  --warn: #e0af58;
+  --danger: #ef8277;
+  --ok-soft: #173529;
+  --accent-soft: #3a1d18;
+  --text-dim: #7e8c88;
+  --border-input: rgba(242, 237, 226, .24);
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, .2);
+  --shadow-pop: 0 24px 70px rgba(0, 0, 0, .48);
+}

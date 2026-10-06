@@ -1,5 +1,5 @@
 /**
- * صالون سيد فرست (Sayed First) - .NET Backend API Client Bridge
+ * صالون يوسف فريست (Youssef First) - .NET Backend API Client Bridge
  * Connects the Frontend (index.html, booking.html, queue-board.html) to the ASP.NET Core Backend & SQL Server
  */
 

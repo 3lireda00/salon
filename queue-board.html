@@ -1,791 +1,207 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>شاشة انتظار العملاء | صالون سيد فرست Sayed First</title>
-  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#c59b27">
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-  
-  <style>
-    :root {
-      --bg: #f4f6fa;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --gold: #c59b27;
-      --gold-light: #b45309;
-      --gold-gradient: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
-      --text: #0f172a;
-      --text-muted: #475569;
-      --success: #059669;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --font-ar: 'Segoe UI', Tahoma, Arial, sans-serif;
-      --font-lat: 'Segoe UI', Arial, sans-serif;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: var(--font-ar);
-      min-height: 100vh;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(217, 119, 6, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.04) 0%, transparent 50%);
-    }
-
-    /* Barber Pole Header Strip */
-    .barber-pole-top {
-      height: 6px;
-      width: 100%;
-      background: repeating-linear-gradient(
-        -45deg,
-        #ef4444, #ef4444 15px,
-        #ffffff 15px, #ffffff 30px,
-        #3b82f6 30px, #3b82f6 45px
-      );
-      background-size: 200% 100%;
-      animation: poleMove 3s linear infinite;
-    }
-
-    @keyframes poleMove {
-      0% { background-position: 0 0; }
-      100% { background-position: 100% 0; }
-    }
-
-    /* TV Header */
-    .tv-header {
-      padding: 16px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #e2e8f0;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-    }
-
-    .tv-brand {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
-    .tv-logo {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      border: 2px solid var(--gold);
-      box-shadow: 0 4px 15px rgba(197, 155, 39, 0.3);
-      object-fit: cover;
-    }
-
-    .tv-brand-info h1 {
-      font-size: 1.8rem;
-      font-weight: 900;
-      color: #1e293b;
-      line-height: 1.1;
-    }
-
-    .tv-brand-info p {
-      color: var(--gold-light);
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .tv-clock-box {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .tv-clock {
-      font-family: var(--font-lat);
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: #b45309;
-      letter-spacing: 1px;
-    }
-
-    .tv-date {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      font-weight: 700;
-      text-align: left;
-    }
-
-    /* Main Board Layout */
-    .board-grid {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1.35fr 1fr;
-      gap: 30px;
-      padding: 30px 40px;
-    }
-
-    /* Section Column */
-    .board-col {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .col-title-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #e2e8f0;
-    }
-
-    .col-title-bar h2 {
-      font-size: 1.45rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--text);
-    }
-
-    .col-title-bar .badge-count {
-      font-family: var(--font-lat);
-      background: #fef3c7;
-      color: #92400e;
-      border: 1px solid #fde68a;
-      font-size: 1rem;
-      font-weight: 900;
-      padding: 3px 16px;
-      border-radius: 20px;
-    }
-
-    /* Chairs Live Cards */
-    .tv-chairs-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .tv-chair-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: all 0.3s;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
-    }
-
-    .tv-chair-card.busy {
-      border-color: #fca5a5;
-      background: linear-gradient(145deg, #fff5f5 0%, #ffffff 60%);
-    }
-
-    .tv-chair-card.available {
-      border-color: #a7f3d0;
-      background: linear-gradient(145deg, #f0fdf4 0%, #ffffff 60%);
-    }
-
-    .tv-chair-card.tv-master-chair {
-      border: 1.5px solid rgba(217, 119, 6, 0.4);
-      background: linear-gradient(145deg, #fffdf8 0%, #fffbeb 60%, #fef9ee 100%);
-      box-shadow: 0 4px 16px rgba(217, 119, 6, 0.1);
-      position: relative;
-    }
-
-    .tv-chair-card.tv-master-chair.busy {
-      border-color: #fca5a5;
-      background: linear-gradient(145deg, #fff5f5 0%, #ffffff 60%);
-    }
-
-    .tv-master-banner {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(217, 119, 6, 0.12);
-      color: #b45309;
-      border: 1px solid rgba(217, 119, 6, 0.25);
-      font-size: 0.76rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      width: fit-content;
-    }
-
-    .tv-chair-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .tv-chair-num {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: #b45309;
-    }
-
-    .tv-chair-status {
-      font-size: 0.85rem;
-      font-weight: 800;
-      padding: 4px 12px;
-      border-radius: 12px;
-    }
-
-    .tv-chair-status.busy {
-      background: #fee2e2;
-      color: #b91c1c;
-      border: 1px solid #fca5a5;
-    }
-
-    .tv-chair-status.available {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-    }
-
-    .tv-chair-cust-name {
-      font-size: 1.35rem;
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .tv-chair-barber {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      font-weight: 700;
-    }
-
-    .tv-chair-time {
-      font-family: var(--font-lat);
-      font-size: 1rem;
-      font-weight: 800;
-      color: #d97706;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Queue Waiting List */
-    .tv-queue-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-      max-height: calc(100vh - 220px);
-    }
-
-    .tv-queue-item {
-      background: var(--card-bg);
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all 0.25s;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-    }
-
-    .tv-queue-item.vip {
-      border-color: #fde68a;
-      background: linear-gradient(90deg, #fffbeb 0%, #ffffff 100%);
-    }
-
-    .tv-queue-item-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .tv-queue-ticket {
-      font-family: var(--font-lat);
-      font-size: 1.25rem;
-      font-weight: 900;
-      color: #92400e;
-      background: #fef3c7;
-      border: 1px solid #fde68a;
-      padding: 4px 12px;
-      border-radius: 8px;
-    }
-
-    .tv-queue-name {
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .tv-queue-barber-req {
-      font-size: 0.92rem;
-      color: #2563eb;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tv-queue-wait {
-      font-family: var(--font-lat);
-      font-size: 1rem;
-      font-weight: 800;
-      color: #d97706;
-    }
-
-    /* Audio Call Overlay Banner */
-    .call-announcement-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(10px);
-      z-index: 9999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .call-announcement-modal.active {
-      display: flex;
-    }
-
-    @keyframes zoomIn {
-      from { transform: scale(0.7); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .call-announcement-card {
-      background: #ffffff;
-      border: 3.5px solid #d97706;
-      border-radius: 28px;
-      padding: 50px 70px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.35);
-      max-width: 750px;
-      width: 90%;
-      position: relative;
-    }
-
-    .call-badge-top {
-      display: inline-block;
-      background: var(--gold-gradient);
-      color: #ffffff;
-      font-weight: 900;
-      font-size: 1.15rem;
-      padding: 6px 24px;
-      border-radius: 30px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
-    }
-
-    .call-cust-name {
-      font-size: 3.2rem;
-      font-weight: 900;
-      color: #0f172a;
-      margin-bottom: 20px;
-    }
-
-    .call-chair-dest {
-      font-size: 1.9rem;
-      font-weight: 900;
-      color: #b45309;
-      margin-bottom: 12px;
-    }
-
-    .call-barber-dest {
-      font-size: 1.35rem;
-      color: #2563eb;
-      font-weight: 800;
-    }
-
-    /* TV Footer */
-    .tv-footer {
-      padding: 12px 40px;
-      background: #ffffff;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      box-shadow: 0 -2px 10px rgba(15, 23, 42, 0.03);
-    }
-
-    .fullscreen-btn {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: var(--text);
-      padding: 6px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: var(--font-ar);
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* TV Bottom Ticker Bar */
-    .tv-bottom-ticker {
-      margin-top: auto;
-      background: #0f172a;
-      color: #ffffff;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      border-top: 2px solid var(--gold);
-      position: relative;
-      z-index: 10;
-    }
-
-    .ticker-badge {
-      background: var(--gold-gradient);
-      color: #ffffff;
-      padding: 0 20px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 800;
-      font-size: 0.95rem;
-      white-space: nowrap;
-      z-index: 2;
-      box-shadow: 4px 0 15px rgba(0,0,0,0.3);
-    }
-
-    .ticker-track {
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .ticker-content {
-      display: inline-block;
-      white-space: nowrap;
-      padding-right: 100%;
-      animation: tickerRun 32s linear infinite;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
-
-    .ticker-sep {
-      color: var(--gold);
-      margin: 0 18px;
-      font-size: 1.1rem;
-    }
-
-    @keyframes tickerRun {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(100%); }
-    }
-  </style>
-  <link rel="stylesheet" href="polish.css?v=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شاشة الانتظار | صالون يوسف فريست - Youssef First</title>
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1220">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap">
+<style>
+:root{--bg:#0f1220;--panel:#161a2d;--line:#252a45;--text:#f3f4f8;--muted:#9aa0ba;--accent:#e2a565;--free:#6fd19a;--busy:#f0c27b}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"Cairo","Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px clamp(20px,4vw,56px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:16px;min-width:0}
+.brand img{width:56px;height:56px;border-radius:16px;object-fit:cover;background:var(--panel)}
+.brand h1{font-size:clamp(1.3rem,2.6vw,2rem);font-weight:800;letter-spacing:-.3px}
+.brand p{color:var(--muted);font-size:.95rem}
+.clock{text-align:end;flex-shrink:0}
+.clock .t{font-size:clamp(1.6rem,3.4vw,2.7rem);font-weight:800;color:var(--accent);line-height:1.1;font-variant-numeric:tabular-nums}
+.clock .d{color:var(--muted);font-size:.95rem}
+main{flex:1;display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(20px,3vw,44px);padding:clamp(20px,3vw,40px) clamp(20px,4vw,56px);min-height:0}
+.col-h{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.col-h h2{font-size:1.25rem;font-weight:700}
+.count{margin-inline-start:auto;min-width:36px;height:36px;padding:0 12px;display:grid;place-items:center;border-radius:18px;background:var(--accent);color:#181206;font-weight:800}
+.chairs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.chair{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;position:relative;transition:border-color .3s}
+.chair.busy{border-color:#5a4a30}
+.chair.master{border-color:var(--accent)}
+.chair .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.chair .nm{font-weight:700;font-size:1.05rem}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(111,209,154,.12);color:var(--free)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chair.busy .pill{background:rgba(240,194,123,.12);color:var(--busy)}
+.chair .who{font-size:1.5rem;font-weight:800;line-height:1.3;margin-bottom:4px}
+.chair.free .who{color:var(--muted);font-weight:600;font-size:1.15rem}
+.chair .brb{color:var(--muted);font-size:.9rem}
+.chair .svc{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);color:#c4c8dc;font-size:.88rem}
+.star{position:absolute;top:-10px;inset-inline-start:18px;background:var(--accent);color:#181206;font-size:.72rem;font-weight:800;padding:2px 10px;border-radius:10px}
+.queue{display:grid;gap:12px;align-content:start}
+.q{display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+.q .no{flex:0 0 auto;min-width:58px;height:58px;padding:0 10px;display:grid;place-items:center;border-radius:14px;background:#20264a;color:var(--accent);font-size:1.25rem;font-weight:800;direction:ltr}
+.q:first-child{border-color:var(--accent)}
+.q:first-child .no{background:var(--accent);color:#181206}
+.q .nm{flex:1;min-width:0;font-size:1.25rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q .vip{color:var(--accent);font-size:.78rem;margin-inline-start:8px}
+.q .eta{color:var(--muted);font-size:.9rem;white-space:nowrap}
+.empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:1.15rem;font-weight:600;border:1px dashed var(--line);border-radius:18px}
+.ticker{display:flex;align-items:center;background:#0a0d19;border-top:1px solid var(--line);height:46px;overflow:hidden}
+.ticker b{flex:0 0 auto;height:100%;display:grid;place-items:center;padding:0 20px;background:var(--accent);color:#181206;font-size:.85rem;font-weight:800;z-index:1}
+.track{flex:1;overflow:hidden;height:100%;display:flex;align-items:center}
+.belt{display:flex;width:max-content;animation:tick 45s linear infinite;color:#d8dbea;font-size:.95rem;white-space:nowrap}
+.belt span{padding-inline:22px}
+@keyframes tick{to{transform:translateX(50%)}}
+footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px clamp(20px,4vw,56px);border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+footer .live::before{content:"";display:inline-block;width:8px;height:8px;margin-inline-end:8px;border-radius:50%;background:var(--free)}
+footer button{background:none;border:1px solid #333a5c;border-radius:10px;color:var(--text);padding:6px 14px;cursor:pointer}
+footer button:hover{background:#1c2140}
+.call{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(8,10,20,.88);backdrop-filter:blur(6px);z-index:50}
+.call.active{display:flex;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:scale(.97)}}
+.call-card{text-align:center;max-width:900px}
+.call-card .tag{display:inline-block;color:var(--accent);font-weight:700;letter-spacing:.5px;margin-bottom:14px;font-size:1.2rem}
+.call-card .who{font-size:clamp(2.6rem,9vw,6.5rem);font-weight:800;line-height:1.15}
+.call-card .to{margin-top:18px;font-size:clamp(1.5rem,4vw,2.8rem);color:#d8dbea;font-weight:600}
+@media(max-width:900px){main{grid-template-columns:1fr}.chairs{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}footer .hint{display:none}}
+@media(prefers-reduced-motion:reduce){.belt{animation:none}.call.active{animation:none}}
+</style>
 </head>
 <body>
-
-  <div class="barber-pole-top"></div>
-
-  <!-- Header -->
-  <header class="tv-header">
-    <div class="tv-brand">
-      <img src="assets/logo.jpg" alt="شعار صالون سيد فرست" class="tv-logo">
-      <div class="tv-brand-info">
-        <h1 id="tv-shop-name">صالون سيد فرست</h1>
-        <p>مرحباً بكم دائماً</p>
-      </div>
-    </div>
-
-    <div class="tv-clock-box">
-      <div class="tv-date" id="tv-date-display">--/--/----</div>
-      <div class="tv-clock" id="tv-clock-display">00:00:00</div>
-    </div>
-  </header>
-
-  <!-- Main Board Grid -->
-  <main class="board-grid">
-    
-    <!-- Left: Now in Chair -->
-    <section class="board-col">
-      <div class="col-title-bar">
-        <h2>
-          <i class="fa-solid fa-chair" style="color:var(--gold);"></i>
-          <span>جاري تقديم الخدمة الآن</span>
-        </h2>
-        <span class="badge-count" id="tv-busy-chairs-count">0</span>
-      </div>
-
-      <div class="tv-chairs-list" id="tv-chairs-grid">
-        <!-- Injected via JavaScript -->
-      </div>
-    </section>
-
-    <!-- Right: Next in Line -->
-    <section class="board-col">
-      <div class="col-title-bar">
-        <h2>
-          <i class="fa-solid fa-clock-rotate-left" style="color:var(--warning);"></i>
-          <span>قائمة الانتظار القادمة</span>
-        </h2>
-        <span class="badge-count" id="tv-waiting-count">0</span>
-      </div>
-
-      <div class="tv-queue-list" id="tv-queue-container">
-        <!-- Injected via JavaScript -->
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Big Call Modal -->
-  <div class="call-announcement-modal" id="call-modal">
-    <div class="call-announcement-card">
-      <div class="call-badge-top">
-        <i class="fa-solid fa-bullhorn"></i> نداء العميل
-      </div>
-      <div class="call-cust-name" id="call-modal-cust">محمد عبد الله</div>
-      <div class="call-chair-dest" id="call-modal-chair">تفضل إلى كرسي رقم 1</div>
-      <div class="call-barber-dest" id="call-modal-barber">مع الكابتن كريم</div>
-    </div>
+<header>
+  <div class="brand">
+    <img src="assets/logo.jpg" alt="شعار صالون يوسف فريست">
+    <div><h1 id="tv-shop-name">صالون يوسف فريست</h1><p>مرحباً بكم دائماً</p></div>
   </div>
+  <div class="clock"><div class="t" id="tv-clock-display">00:00:00</div><div class="d" id="tv-date-display">--</div></div>
+</header>
 
-  <!-- TV Bottom Ticker Bar -->
-  <div class="tv-bottom-ticker">
-    <div class="ticker-badge"><i class="fa-solid fa-bullhorn"></i> إعلانات وتنبيهات</div>
-    <div class="ticker-track">
-      <div class="ticker-content">
-        <span>💈 أهلًا بكم في صالون سيد فرست، نسعد بخدمتكم.</span>
-        <span class="ticker-sep">✦</span>
-        <span>📋 تابعوا الشاشة لمعرفة الكراسي المتاحة ودوركم في الانتظار.</span>
-        <span class="ticker-sep">✦</span>
-        <span>📅 يمكنكم إرسال طلب حجز من صفحة المواعيد.</span>
-        <span class="ticker-sep">✦</span>
-        <span>شكرًا لزيارتكم صالون سيد فرست.</span>
-      </div>
-    </div>
-  </div>
+<main>
+  <section>
+    <div class="col-h"><h2>جاري تقديم الخدمة الآن</h2><span class="count" id="tv-busy-chairs-count">0</span></div>
+    <div class="chairs" id="tv-chairs-grid"></div>
+  </section>
+  <section>
+    <div class="col-h"><h2>قائمة الانتظار</h2><span class="count" id="tv-waiting-count">0</span></div>
+    <div class="queue" id="tv-queue-container"></div>
+  </section>
+</main>
 
-  <!-- Footer -->
-  <footer class="tv-footer">
-    <div>
-      <i class="fa-solid fa-wifi" style="color:var(--success); margin-left:6px;"></i>
-      <span>الشاشة متصلة ومحدثة لحظياً</span>
-    </div>
-    <div style="font-weight:700; color:var(--gold-light);">
-      <span>يرجى التوجه إلى الكرسي المخصص فور ظهور اسمكم في الشاشة</span>
-    </div>
-    <div>
-      <button class="fullscreen-btn" id="btn-tv-fs">
-        <i class="fa-solid fa-expand"></i> ملء الشاشة
-      </button>
-    </div>
-  </footer>
+<div class="call" id="call-modal"><div class="call-card">
+  <div class="tag">نداء العميل</div>
+  <div class="who" id="call-modal-cust"></div>
+  <div class="to" id="call-modal-chair"></div>
+</div></div>
 
-  <script>
-    // Live Clock
-    function updateClock() {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-      const dateStr = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      document.getElementById('tv-clock-display').textContent = timeStr;
-      document.getElementById('tv-date-display').textContent = dateStr;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+<div class="ticker"><b>تنبيهات</b><div class="track"><div class="belt">
+  <span> أهلًا بكم في صالون يوسف فريست، نسعد بخدمتكم.</span><span> تابعوا الشاشة لمعرفة الكراسي المتاحة ودوركم في الانتظار.</span><span> يمكنكم إرسال طلب حجز من صفحة المواعيد.</span><span>شكرًا لزيارتكم صالون يوسف فريست.</span>
+  <span> أهلًا بكم في صالون يوسف فريست، نسعد بخدمتكم.</span><span> تابعوا الشاشة لمعرفة الكراسي المتاحة ودوركم في الانتظار.</span><span> يمكنكم إرسال طلب حجز من صفحة المواعيد.</span><span>شكرًا لزيارتكم صالون يوسف فريست.</span>
+</div></div></div>
 
-    // Fullscreen Toggle
-    document.getElementById('btn-tv-fs').addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => alert(err.message));
-      } else {
-        document.exitFullscreen();
-      }
-    });
+<footer>
+  <div class="live">الشاشة متصلة ومحدثة لحظياً</div>
+  <div class="hint">يرجى التوجه إلى الكرسي المخصص فور ظهور اسمكم</div>
+  <button id="btn-tv-fs">ملء الشاشة</button>
+</footer>
 
-    // Audio chime generator using Web Audio API
-    function playChime() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15); // A5
-        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 1.2);
-      } catch (e) {
-        console.log('Audio chime error:', e);
-      }
-    }
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-    // TTS Call
-    function speakCall(custName, chairName, barberName) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const text = barberName
-          ? `العميل ${custName}، تفضل إلى ${chairName} مع ${barberName}`
-          : `العميل ${custName}، تفضل إلى ${chairName}`;
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'ar-SA';
-        msg.rate = 0.95;
-        window.speechSynthesis.speak(msg);
-      }
-    }
+function updateClock() {
+  const now = new Date();
+  $('tv-clock-display').textContent = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  $('tv-date-display').textContent = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+setInterval(updateClock, 1000); updateClock();
 
-    // Broadcast Channel & Sync
-    let channel;
-    try {
-      channel = new BroadcastChannel('barbershop_channel');
-      channel.onmessage = (event) => {
-        if (event.data && event.data.type === 'CUSTOMER_CALLED') {
-          showCallBanner(event.data.payload);
-        } else if (event.data && event.data.type === 'DATA_UPDATED') {
-          renderBoard();
-        }
-      };
-    } catch (e) {
-      console.log('BroadcastChannel not supported, falling back to storage listener');
-    }
+$('btn-tv-fs').addEventListener('click', () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => alert(err.message));
+  else document.exitFullscreen();
+});
 
-    window.addEventListener('storage', () => {
-      renderBoard();
-    });
+function playChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 1.2);
+  } catch (e) { console.log('Audio chime error:', e); }
+}
 
-    function showCallBanner(payload) {
-      const modal = document.getElementById('call-modal');
-      document.getElementById('call-modal-cust').textContent = payload.customerName;
-      document.getElementById('call-modal-chair').textContent = `تفضل إلى كرسي رقم ${payload.chairId}`;
-      document.getElementById('call-modal-barber').textContent = '';
-      document.getElementById('call-modal-barber').style.display = 'none';
-      
-      modal.classList.add('active');
-      playChime();
-      speakCall(payload.customerName, `كرسي رقم ${payload.chairId}`, '');
+function speakCall(custName, chairName, barberName) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const text = barberName ? `العميل ${custName}، تفضل إلى ${chairName} مع ${barberName}` : `العميل ${custName}، تفضل إلى ${chairName}`;
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'ar-SA'; msg.rate = 0.95;
+    window.speechSynthesis.speak(msg);
+  }
+}
 
-      setTimeout(() => {
-        modal.classList.remove('active');
-      }, 7000);
-    }
+function showCallBanner(payload) {
+  $('call-modal-cust').textContent = payload.customerName;
+  $('call-modal-chair').textContent = `تفضل إلى كرسي رقم ${payload.chairId}`;
+  $('call-modal').classList.add('active');
+  playChime();
+  speakCall(payload.customerName, `كرسي رقم ${payload.chairId}`, '');
+  setTimeout(() => $('call-modal').classList.remove('active'), 7000);
+}
 
-    function renderBoard() {
-      const rawData = localStorage.getItem('barbershop_data_v1');
-      if (!rawData) return;
-      const data = JSON.parse(rawData);
+let channel;
+try {
+  channel = new BroadcastChannel('barbershop_channel');
+  channel.onmessage = (event) => {
+    if (event.data && event.data.type === 'CUSTOMER_CALLED') showCallBanner(event.data.payload);
+    else if (event.data && event.data.type === 'DATA_UPDATED') renderBoard();
+  };
+} catch (e) { console.log('BroadcastChannel not supported, falling back to storage listener'); }
+window.addEventListener('storage', () => renderBoard());
 
-      // Shop Name
-      if (data.settings && data.settings.shopName) {
-        document.getElementById('tv-shop-name').textContent = data.settings.shopName;
-      }
+function renderBoard() {
+  let data;
+  try { const raw = localStorage.getItem('barbershop_data_v1'); if (!raw) return; data = JSON.parse(raw); } catch (e) { return; }
 
-      // Render Chairs
-      const chairsGrid = document.getElementById('tv-chairs-grid');
-      chairsGrid.innerHTML = '';
-      let busyCount = 0;
+  if (data.settings && data.settings.shopName) $('tv-shop-name').textContent = data.settings.shopName;
 
-      data.chairs.forEach(chair => {
-        const barber = data.barbers.find(b => b.id === chair.barberId) || { name: 'غير محدد' };
-        const isBusy = chair.status === 'busy' && chair.currentClient;
-        if (isBusy) busyCount++;
-        const isMaster = chair.id === 6 || chair.isMaster || (barber && (barber.isMaster || (barber.name && barber.name.includes('يوسف فرست'))));
+  let busyCount = 0;
+  $('tv-chairs-grid').innerHTML = (data.chairs || []).map(chair => {
+    const barber = (data.barbers || []).find(b => b.id === chair.barberId) || { name: 'غير محدد' };
+    const busy = chair.status === 'busy' && chair.currentClient;
+    if (busy) busyCount++;
+    const master = chair.id === 6 || chair.isMaster || (barber && (barber.isMaster || (barber.name && barber.name.includes('يوسف فرست'))));
+    const svc = busy && chair.currentClient.services ? chair.currentClient.services.join('، ') : '';
+    return `<div class="chair ${busy ? 'busy' : 'free'} ${master ? 'master' : ''}">
+      ${master ? '<span class="star">سينيور باربر</span>' : ''}
+      <div class="top"><span class="nm">${esc(chair.name || ('كرسي ' + chair.id))}</span><span class="pill">${busy ? 'مشغول' : 'متاح'}</span></div>
+      <div class="who">${busy ? esc(chair.currentClient.name) : 'الكرسي شاغر'}</div>
+      <div class="brb">${esc(barber.name)}</div>
+      ${busy ? `<div class="svc">${esc(svc || 'خدمات')}</div>` : ''}
+    </div>`;
+  }).join('');
+  $('tv-busy-chairs-count').textContent = busyCount;
 
-        const card = document.createElement('div');
-        card.className = `tv-chair-card ${isBusy ? 'busy' : 'available'} ${isMaster ? 'tv-master-chair' : ''}`;
-        card.innerHTML = `
-          ${isMaster ? `
-            <div class="tv-master-banner">
-              <i class="fa-solid fa-star"></i>
-              <span>سينيور باربر (يوسف فرست)</span>
-            </div>
-          ` : ''}
-          <div class="tv-chair-header">
-            <div class="tv-chair-num" style="${isMaster ? 'color:#b45309;' : ''}">
-              <i class="fa-solid ${isMaster ? 'fa-star' : 'fa-chair'}"></i>
-              <span>${chair.name || ('كرسي ' + chair.id)}</span>
-            </div>
-            <div class="tv-chair-status ${isBusy ? 'busy' : 'available'}" style="${isMaster ? 'border-color:#fcd34d;' : ''}">
-              ${isBusy ? 'مشغول بالخدمة' : 'متاح الآن'}
-            </div>
-          </div>
-          <div style="font-size:0.85rem; color:${isMaster ? 'var(--gold)' : 'var(--gold)'}; font-weight:700; margin-bottom:6px;">
-            <i class="fa-solid fa-scissors"></i> ${barber.name} ${isMaster ? '(Senior Barber)' : ''}
-          </div>
-          <div>
-            <div class="tv-chair-cust-name">
-              ${isBusy ? chair.currentClient.name : 'الكرسي شاغر'}
-            </div>
-          </div>
-          ${isBusy ? `
-            <div class="tv-chair-time">
-              <i class="fa-regular fa-clock"></i>
-              <span>جاري تقديم: ${chair.currentClient.services ? chair.currentClient.services.join('، ') : 'خدمات'}</span>
-            </div>
-          ` : ''}
-        `;
-        chairsGrid.appendChild(card);
-      });
-      document.getElementById('tv-busy-chairs-count').textContent = busyCount;
+  const waiting = data.queue || [];
+  $('tv-waiting-count').textContent = waiting.length;
+  $('tv-queue-container').innerHTML = waiting.length === 0
+    ? '<div class="empty">لا يوجد عملاء في الانتظار حالياً، تفضل بالدخول مباشرة</div>'
+    : waiting.map((item, idx) => `<div class="q">
+        <div class="no">#${esc(item.ticket)}</div>
+        <div class="nm">${esc(item.name)}${item.isVip ? '<span class="vip"> VIP</span>' : ''}</div>
+        <div class="eta">حوالي ${(idx + 1) * 20} د</div>
+      </div>`).join('');
+}
 
-      // Render Queue
-      const queueList = document.getElementById('tv-queue-container');
-      queueList.innerHTML = '';
-      const waitingItems = data.queue || [];
-      document.getElementById('tv-waiting-count').textContent = waitingItems.length;
-
-      if (waitingItems.length === 0) {
-        queueList.innerHTML = `
-          <div style="text-align:center; padding:50px 20px; color:var(--text-muted);">
-            <i class="fa-solid fa-scissors" style="font-size:2.6rem; color:var(--gold); margin-bottom:12px; opacity:0.6; display:inline-block; transform:rotate(-45deg);"></i>
-            <p style="font-size:1.15rem; font-weight:700;">لا يوجد عملاء في الانتظار حالياً، تفضل بالدخول مباشرة!</p>
-          </div>
-        `;
-        return;
-      }
-
-      waitingItems.forEach((item, idx) => {
-        const estMinutes = (idx + 1) * 20;
-
-        const row = document.createElement('div');
-        row.className = `tv-queue-item ${item.isVip ? 'vip' : ''}`;
-        row.innerHTML = `
-          <div class="tv-queue-item-left">
-            <div class="tv-queue-ticket">#${item.ticket}</div>
-            <div>
-              <div class="tv-queue-name">${item.name} ${item.isVip ? '<span style="color:var(--gold); font-size:0.8rem; margin-right:4px;">★ VIP</span>' : ''}</div>
-            </div>
-          </div>
-          <div class="tv-queue-wait">
-            <i class="fa-regular fa-hourglass"></i> حوالي ${estMinutes} د
-          </div>
-        `;
-        queueList.appendChild(row);
-      });
-    }
-
-    // Initial render and periodic check
-    renderBoard();
-    setInterval(renderBoard, 3000);
-  </script>
+renderBoard();
+setInterval(renderBoard, 3000);
+</script>
 </body>
 </html>
