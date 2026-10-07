@@ -143,6 +143,7 @@
         font-weight: 600;
         font-size: 0.96rem;
       }
+      .svc .pr { flex: 0 0 auto; color: var(--accent-d); font: 400 23px/1 var(--display); white-space: nowrap; }
       .svc .ck {
         width: 22px;
         height: 22px;
@@ -425,7 +426,7 @@
       }
       body { font-family:var(--font); background:var(--paper); color:var(--ink); padding-bottom:calc(110px + env(safe-area-inset-bottom)); }
       .hero { max-width:none; padding:22px 18px 27px; background:var(--petrol); color:#fff; text-align:start; position:relative; }
-      .hero::after { content:""; height:7px; position:absolute; inset-inline:0; bottom:0; background:var(--pole); background-size:36px 36px; animation:yf-pole 2.4s linear infinite; }
+      .hero::after { display:none; }
       .hero img { width:52px; height:52px; vertical-align:middle; border:0; border-radius:15px; box-shadow:none; }
       .hero h1 { display:inline-block; margin:0 12px; vertical-align:middle; color:#fff; font:400 clamp(1.5rem,5vw,2rem)/1.2 var(--display); }
       .hero p { max-width:620px; margin:8px auto 0; color:#d4e0dc; text-align:center; font-size:.9rem; }
@@ -480,7 +481,7 @@
       .rows { background:var(--card-2); }
       .wa { border-radius:99px; }
       @keyframes yf-pole { to { background-position-y:36px; } }
-      @media (max-width:420px) { .hero { padding:18px 15px 25px; } .hero img { width:44px; height:44px; } main > section { padding:15px; } h2 { font-size:22px; } .bar { padding-inline:12px; } .go, .back { height:48px; padding-inline:16px; } .back { min-width:60px; } .booking-review > div { flex-direction:column; gap:1px; } .booking-review strong { text-align:start; } }
+      @media (max-width:420px) { .hero { padding:18px 15px 20px; } .hero img { width:44px; height:44px; } main > section { padding:15px; } h2 { font-size:22px; } .svc { gap:9px; padding:12px 10px; } .svc .nm { font-size:.88rem; } .svc .pr { font-size:20px; } .bar { padding-inline:12px; } .go, .back { height:48px; padding-inline:16px; } .back { min-width:60px; } .booking-review > div { flex-direction:column; gap:1px; } .booking-review strong { text-align:start; } }
       @media (prefers-reduced-motion:reduce) { .hero::after,.ticket::before { animation:none; } }
     </style>
   </head>
@@ -757,7 +758,7 @@
         $("services-container").innerHTML = CATALOG.map((srv) => {
           const on = selectedServices.some((s) => s.id === srv.id);
           return `<button type="button" class="svc ${on ? "on" : ""}" data-id="${esc(srv.id)}">
-      <span class="ic"><i class="fa-solid ${esc(/^fa-[a-z0-9-]+$/.test(srv.icon) ? srv.icon : "fa-scissors")}"></i></span><span class="nm">${esc(srv.name)}</span><span class="ck">${CHECK}</span></button>`;
+      <span class="ic"><i class="fa-solid ${esc(/^fa-[a-z0-9-]+$/.test(srv.icon) ? srv.icon : "fa-scissors")}"></i></span><span class="nm">${esc(srv.name)}</span><span class="pr">${(Number(srv.price) || 0).toLocaleString("ar-EG")} ج.م</span><span class="ck">${CHECK}</span></button>`;
         }).join("");
         updateSummary();
       }

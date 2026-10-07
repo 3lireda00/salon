@@ -1,4 +1,5 @@
 /* Port of the supplied barber-pole interface onto the existing application DOM. */
+.feature-hidden, .shift-history-panel { display: none !important; }
 @keyframes yf-pole { to { background-position-y: 36px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
 
@@ -12,17 +13,17 @@ h1, h2, h3, h4, .metric-card .value, .report-summary-box .amount, .shift-drawer-
 .app-sidebar { width: 236px; min-width: 236px; height: 100vh; padding: 0 0 0 7px; position: sticky; inset-block-start: 0; z-index: 100; overflow: hidden; background: var(--petrol); color: #f2ede2; border: 0; border-radius: 0; box-shadow: none; }
 .app-sidebar::after { content: ""; position: absolute; inset-block: 0; inset-inline-end: 0; width: 7px; background: var(--pole); background-size: 36px 36px; animation: yf-pole 2.2s linear infinite; }
 #salon-splash-screen { background: var(--petrol); color: var(--paper); }
-.splash-logo-img { display: none; }
-.splash-logo-wrapper { display: grid; place-items: center; width: 88px; height: 88px; border-radius: 26px; background: var(--accent); box-shadow: none; }
-.splash-logo-wrapper::before { content: "س"; color: #fff; font: 400 58px var(--display); }
+.splash-logo-img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.splash-logo-wrapper { display: grid; place-items: center; width: 88px; height: 88px; border-radius: 22px; background: var(--card); box-shadow: none; overflow: hidden; }
+.splash-logo-wrapper::before { content: none; }
 .splash-halo { display: none; }
 .splash-tagline { color: #d4e0dc; }
 .splash-progress-track { border-radius: var(--r-pill); }
 .splash-progress-bar { background: var(--pole); background-size: 36px 36px; }
 .brand-section { padding: 22px 18px 18px; background: transparent; border: 0; gap: 12px; }
-.brand-section::before { content: "س"; order: 0; display: grid; place-items: center; flex: 0 0 46px; width: 46px; height: 46px; border-radius: 15px; background: var(--accent); color: #fff; font: 400 30px var(--display); }
+.brand-section::before { content: none; }
 .brand-info { order: 1; }
-.brand-logo-img { display: none; }
+.brand-logo-img { display: block; order: 0; flex: 0 0 46px; width: 46px; height: 46px; border-radius: 14px; object-fit: cover; }
 .brand-info h1 { color: #fff; font: 400 22px/1.2 var(--display); }
 .role-brand-badge { color: #e8d8bb; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
 .nav-menu { padding: 7px 10px; gap: 3px; }
@@ -129,7 +130,7 @@ h1, h2, h3, h4, .metric-card .value, .report-summary-box .amount, .shift-drawer-
 .pos-item-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: var(--card-2); color: var(--petrol); font-size: 16px; }
 .pos-item-cat-badge { border-radius: var(--r-pill); color: var(--muted); background: var(--card-2); padding: 3px 8px; font-size: 10px; }
 .pos-item-title { margin-top: 8px; color: var(--ink); font-weight: 700; }
-.pos-item-dur { color: var(--muted); font-size: 11px; }
+.pos-item-dur { display: none !important; }
 .pos-item-price { font: 400 24px var(--display); color: var(--accent-d); }
 .pos-item-add-btn-full { color: var(--petrol); font-size: 12px; font-weight: 700; }
 .pos-cart-panel { position: sticky; inset-block-start: 88px; min-width: 0; padding: 17px; border: 1.5px solid var(--line); border-radius: 20px; background: var(--card); box-shadow: var(--shadow-card); }
@@ -188,8 +189,8 @@ tbody tr:hover { background: color-mix(in srgb, var(--card-2) 65%, transparent);
 .lock-screen, #lock-screen { background: var(--petrol); color: var(--paper); }
 .system-lock-screen { background: var(--petrol) !important; color: var(--paper); }
 .lock-screen-box { border: 1.5px solid rgba(255,255,255,.16); border-radius: 24px; background: var(--card); box-shadow: var(--shadow-pop); }
-.lock-logo-img { display: none; }
-.lock-logo-wrapper::before { content: "س"; width: 72px; height: 72px; display: grid; place-items: center; border-radius: 22px; background: var(--accent); color: #fff; font: 400 48px var(--display); }
+.lock-logo-img { display: block; width: 82px; height: 82px; border-radius: 22px; object-fit: cover; border: 2px solid var(--accent); }
+.lock-logo-wrapper::before { content: none; }
 .pin-display-dots { display: flex; justify-content: center; gap: 10px; margin: 14px auto; }
 .pin-display-dots .pin-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--line); background: transparent; }
 .pin-display-dots .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
@@ -280,8 +281,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
   .modal-body { padding: 0 !important; }
 }
 
-/* Keep the existing hamburger + drawer behavior on touch screens. The
-   previous mobile bottom rail conflicted with the drawer controls in app.js. */
+/* Responsive navigation and layout for touch screens. */
 @media (max-width: 991px) {
   html, body { width: 100%; min-width: 0; overflow-x: hidden; }
   #app-container { display: block; width: 100%; min-width: 0; padding: 0; }
@@ -355,3 +355,70 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
   .pos-items-grid { gap: 6px; }
   .pos-item-card { padding: 8px; }
 }
+
+/* Mobile uses the reference's horizontally scrollable bottom navigation. */
+@media (max-width: 900px) {
+  #app-container { display: block; padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .app-sidebar {
+    inset: auto 0 0;
+    width: 100% !important;
+    min-width: 0;
+    height: calc(78px + env(safe-area-inset-bottom, 0px));
+    padding: 5px 0 env(safe-area-inset-bottom, 0px);
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    border-radius: 18px 18px 0 0;
+    transform: none;
+    box-shadow: 0 -8px 28px rgba(0,0,0,.14);
+  }
+  .app-sidebar.mobile-open { transform: none; }
+  .app-sidebar::after { inset: 0 0 auto; width: 100%; height: 5px; }
+  .brand-section, .sidebar-footer { display: none !important; }
+  .nav-menu {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    padding: 8px 5px 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 3px;
+    scrollbar-width: none;
+  }
+  .nav-menu::-webkit-scrollbar { display: none; }
+  .nav-link {
+    position: relative;
+    display: flex;
+    flex: 0 0 84px;
+    width: 84px;
+    min-width: 84px;
+    min-height: 62px;
+    height: 100%;
+    padding: 5px 4px 2px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+  .nav-link::before { display: none; }
+  .nav-link .icon { display: flex; width: auto; height: 22px; flex: 0 0 22px; font-size: 17px; }
+  .nav-link span:not(.icon) { display: block !important; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .nav-link .nav-badge, .nav-link .nav-role-tag { position: absolute; inset-block-start: 0; inset-inline-start: 12px; min-width: 16px; padding: 0 4px; font-size: 9px; }
+  .sidebar-mobile-backdrop { display: none !important; }
+  .mobile-menu-toggle { display: none !important; }
+  .top-header { position: relative; flex-wrap: wrap; padding: 10px 14px; align-items: flex-start; }
+  .header-brand-wrap { flex: 1 1 100%; }
+  .header-title-box h2 { font-size: clamp(18px, 5vw, 23px); }
+  .header-title-box p { display: none; }
+  .header-actions { width: 100%; max-width: 100%; justify-content: flex-start; overflow-x: auto; padding-bottom: 3px; }
+}
+
+/* The POS cards show price only; remove the animated pole from the page edge. */
+.app-sidebar::after { display: none !important; }

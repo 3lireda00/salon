@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="theme.css?v=1.1">
   <link rel="stylesheet" href="reception.css?v=1.0">
   <link rel="stylesheet" href="variables.css?v=1.0">
-  <link rel="stylesheet" href="redesign.css?v=1.1">
+  <link rel="stylesheet" href="redesign.css?v=1.4">
   <!-- Lucide / FontAwesome Icons via CDN or SVG -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
@@ -85,12 +85,12 @@
           <span>الخزينة والتقارير</span>
           <span class="nav-role-tag" id="tag-nav-reports"></span>
         </a>
-        <a class="nav-link" data-view="view-customers" id="nav-customers" href="javascript:void(0)" onclick="switchView('view-customers')">
+        <a class="nav-link feature-hidden" data-view="view-customers" id="nav-customers" href="javascript:void(0)" onclick="switchView('view-customers')">
           <span class="icon"><i class="fa-solid fa-address-book"></i></span>
           <span>عملاء وولاء</span>
           <span class="nav-badge" id="badge-customers-count" style="display:none;">0</span>
         </a>
-        <a class="nav-link admin-only" data-view="view-analytics" id="nav-analytics" href="javascript:void(0)" onclick="switchView('view-analytics')">
+        <a class="nav-link admin-only feature-hidden" data-view="view-analytics" id="nav-analytics" href="javascript:void(0)" onclick="switchView('view-analytics')">
           <span class="icon"><i class="fa-solid fa-chart-column"></i></span>
           <span>تحليلات متقدمة</span>
           <span class="nav-role-tag" id="tag-nav-analytics"></span>
@@ -592,7 +592,7 @@
               <i class="fa-solid fa-file-excel" style="color:#107c41;"></i>
               <span>إنتاجية الحلاقين (Excel)</span>
             </button>
-            <button class="btn-secondary" id="btn-export-shift-history" title="تصدير سجل الورديات والفواتير والمصروفات إلى Excel">
+            <button class="btn-secondary feature-hidden" id="btn-export-shift-history" title="تصدير سجل الورديات والفواتير والمصروفات إلى Excel">
               <i class="fa-solid fa-file-excel" style="color:#107c41;"></i>
               <span>سجل الورديات (Excel)</span>
             </button>
@@ -611,7 +611,7 @@
             </button>
           </div>
 
-          <div style="margin-bottom:28px;">
+          <div class="shift-history-panel" style="margin-bottom:28px;">
             <h4 style="margin-bottom:12px; font-weight:800; color:var(--text-main);"><i class="fa-solid fa-clock-rotate-left"></i> سجل تقفيل الورديات</h4>
             <div class="data-table-container">
               <table class="custom-table">
@@ -676,7 +676,7 @@
         </section>
 
         <!-- ================= VIEW 7: CUSTOMERS CRM ================= -->
-        <section id="view-customers" class="page-view">
+        <section id="view-customers" class="page-view feature-hidden">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
             <h3>
               <i class="fa-solid fa-address-book" style="color:var(--gold);"></i>
@@ -738,7 +738,7 @@
         </section>
 
         <!-- ================= VIEW 8: ADVANCED ANALYTICS ================= -->
-        <section id="view-analytics" class="page-view">
+        <section id="view-analytics" class="page-view feature-hidden">
           <h3 style="margin-bottom:20px;">
             <i class="fa-solid fa-chart-column" style="color:var(--gold);"></i>
             <span>تحليلات المبيعات والأداء</span>
@@ -1442,6 +1442,6 @@
   <script defer src="assets/qrcode.js"></script>
 
   <!-- App Script -->
-  <script defer src="app.js?v=4.0"></script>
+  <script defer src="app.js?v=4.1"></script>
 </body>
 </html>

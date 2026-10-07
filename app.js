@@ -998,7 +998,6 @@ function renderPosCatalog() {
 
     const catIcon = item.category === 'منتجات' ? 'fa-box' : 'fa-scissors';
     const catBadge = `<i class="fa-solid ${catIcon}"></i> ${item.category === 'منتجات' ? 'منتج' : item.category}`;
-    const subText = item.duration ? `المدة: ${item.duration} دقيقة` : '';
     const itemIcon = /^fa-[a-z0-9-]+$/.test(item.icon || '') ? item.icon : (item.category === 'منتجات' ? 'fa-bottle-water' : 'fa-scissors');
 
     card.innerHTML = `
@@ -1008,7 +1007,7 @@ function renderPosCatalog() {
         <span class="pos-item-cat-badge">${catBadge}</span>
       </div>
         <div class="pos-item-title">${item.name}</div>
-        <div class="pos-item-dur">${subText}</div>
+        <div class="pos-item-price">${formatCurrency(item.price)}</div>
       </div>
       <div class="pos-item-add-btn-full">
         <i class="fa-solid fa-cart-plus"></i>
